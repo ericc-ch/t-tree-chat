@@ -4,6 +4,6 @@
     "source.organizeImports": "never"
   },
   "cSpell.words": ["echristian"],
-  "tailwindCSS.classFunctions": ["clsx", "cn"],
+  "tailwindCSS.classFunctions": ["clsx", "cn", "cva"],
   "typescript.tsdk": "node_modules/typescript/lib"
 }
