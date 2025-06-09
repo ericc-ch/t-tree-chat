@@ -71,20 +71,9 @@ function MessageNode({ data }: NodeProps<ChatNodeType>) {
   return (
     <>
       <Handle type="target" position={Position.Top} />
-      <div
-        style={{
-          padding: 10,
-          border: "1px solid #ddd",
-          borderRadius: 5,
-          background: "white",
-          color: "black",
-          minWidth: 150,
-        }}
-      >
+      <div className="min-w-[150px] rounded-md border border-neutral-300 bg-white p-2.5 text-black">
         <strong>{data.user}</strong>
-        <p style={{ margin: 0, marginTop: 5, whiteSpace: "pre-wrap" }}>
-          {data.message}
-        </p>
+        <p className="m-0 mt-1.5 whitespace-pre-wrap">{data.message}</p>
       </div>
       <Handle type="source" position={Position.Bottom} />
     </>
@@ -97,30 +86,18 @@ function UserInputNode({ data }: NodeProps<ChatNodeType>) {
   return (
     <>
       <Handle type="target" position={Position.Top} />
-      <div
-        style={{
-          padding: 10,
-          border: "1px solid #ddd",
-          borderRadius: 5,
-          background: "white",
-          color: "black",
-          minWidth: 150,
-        }}
-      >
+      <div className="min-w-[150px] rounded-md border border-neutral-300 bg-white p-2.5 text-black">
         <strong>{data.user}</strong>
-        <p style={{ margin: 0, marginTop: 5, whiteSpace: "pre-wrap" }}>
-          {data.message}
-        </p>
-        <div style={{ marginTop: 10 }}>
+        <p className="m-0 mt-1.5 whitespace-pre-wrap">{data.message}</p>
+        <div className="mt-2.5">
           <Textarea
             value={input}
             onChange={(e) => {
               setInput(e.target.value)
             }}
-            style={{ width: "100%", boxSizing: "border-box" }}
             rows={2}
           />
-          <Button style={{ marginTop: 5, width: "100%" }}>Send</Button>
+          <Button>Send</Button>
         </div>
       </div>
       <Handle type="source" position={Position.Bottom} />
@@ -140,7 +117,7 @@ export function App() {
   )
 
   return (
-    <div style={{ width: "100vw", height: "100vh" }}>
+    <div className="h-screen w-screen">
       <ReactFlow
         colorMode="dark"
         nodes={nodes}

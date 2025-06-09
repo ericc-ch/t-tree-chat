@@ -1,0 +1,9 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
+  },
+  "cSpell.words": ["echristian"],
+  "tailwindCSS.classFunctions": ["clsx", "cn"],
+  "typescript.tsdk": "node_modules/typescript/lib"
+}
