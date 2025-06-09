@@ -1,42 +1,99 @@
-import { useState } from "react"
+import {
+  Background,
+  Controls,
+  Handle,
+  Position,
+  ReactFlow,
+  type Node,
+  type NodeProps,
+} from "@xyflow/react"
+import "@xyflow/react/dist/style.css"
 
-import reactLogo from "./assets/react.svg"
+import "./styles/global.css"
 
-import viteLogo from "/vite.svg"
+type ChatNodeType = Node<
+  {
+    user: string
+    message: string
+  },
+  "chat"
+>
 
-import "./App.css"
+const initialNodes: Array<Node> = [
+  {
+    id: "1",
+    type: "chat",
+    position: { x: 0, y: 0 },
+    data: { user: "User A", message: "Hey, how are you?" },
+  },
+  {
+    id: "2",
+    type: "chat",
+    position: { x: 250, y: 100 },
+    data: { user: "User B", message: "I'm good, thanks! How about you?" },
+  },
+  {
+    id: "3",
+    type: "chat",
+    position: { x: 0, y: 200 },
+    data: {
+      user: "User A",
+      message: "Doing great! Working on this React Flow demo.",
+    },
+  },
+  {
+    id: "4",
+    type: "chat",
+    position: { x: 250, y: 300 },
+    data: { user: "User B", message: "Oh cool! Looks good." },
+  },
+]
+const initialEdges = [
+  { id: "e1-2", source: "1", target: "2" },
+  { id: "e2-3", source: "2", target: "3" },
+  { id: "e3-4", source: "3", target: "4" },
+]
 
-function App() {
-  const [count, setCount] = useState(0)
+const nodeTypes = {
+  chat: ChatNode,
+}
 
+function ChatNode({ data }: NodeProps<ChatNodeType>) {
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button
-          onClick={() => {
-            setCount((count) => count + 1)
-          }}
-        >
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
+      <Handle type="target" position={Position.Top} />
+      <div
+        style={{
+          padding: 10,
+          border: "1px solid #ddd",
+          borderRadius: 5,
+          background: "white",
+          color: "black",
+          minWidth: 150,
+        }}
+      >
+        <strong>{data.user}</strong>
+        <p style={{ margin: 0, marginTop: 5, whiteSpace: "pre-wrap" }}>
+          {data.message}
         </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Handle type="source" position={Position.Bottom} />
     </>
   )
 }
 
-export default App
+export function App() {
+  return (
+    <div style={{ width: "100vw", height: "100vh" }}>
+      <ReactFlow
+        colorMode="dark"
+        defaultNodes={initialNodes}
+        defaultEdges={initialEdges}
+        nodeTypes={nodeTypes}
+      >
+        <Background />
+        <Controls />
+      </ReactFlow>
+    </div>
+  )
+}
