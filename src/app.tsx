@@ -13,6 +13,7 @@ import "@mantine/core/styles.layer.css"
 import "@xyflow/react/dist/style.css"
 import {
   Background,
+  BackgroundVariant,
   Controls,
   Handle,
   Panel,
@@ -121,7 +122,7 @@ export function App() {
             onEdgesChange={onEdgesChange}
             onNodesChange={onNodesChange}
           >
-            <Background gap={32} />
+            <Background gap={32} variant={BackgroundVariant.Cross} />
             <Controls />
             <Panel position="top-left">
               <Paper withBorder p="sm">
