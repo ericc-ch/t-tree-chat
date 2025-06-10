@@ -1,23 +1,22 @@
 import { create } from "zustand"
 
 interface SettingsState {
+  googleAPIKey: string | undefined
   openRouterAPIKey: string | undefined
-  setAPIKeys: (options: SetAPIKeysOptions) => void
-  setOpenRouterAPIKey: (openRouterAPIKey: string) => void
 }
 
-export const useSettingsStore = create<SettingsState>()((set) => ({
+interface SettingsStore extends SettingsState {
+  setAPIKeys: (options: SettingsState) => void
+}
+
+export const useSettingsStore = create<SettingsStore>()((set) => ({
+  googleAPIKey: undefined,
   openRouterAPIKey: undefined,
 
-  setAPIKeys: (options: SetAPIKeysOptions) => {
-    set({ openRouterAPIKey: options.openRouterAPIKey })
-  },
-
-  setOpenRouterAPIKey: (openRouterAPIKey: string | undefined) => {
-    set({ openRouterAPIKey })
+  setAPIKeys: (options: SettingsState) => {
+    set({
+      openRouterAPIKey: options.openRouterAPIKey,
+      googleAPIKey: options.googleAPIKey,
+    })
   },
 }))
-
-interface SetAPIKeysOptions {
-  openRouterAPIKey: string | undefined
-}

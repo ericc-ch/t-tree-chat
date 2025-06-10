@@ -5,7 +5,6 @@ import {
   MantineProvider,
   Paper,
   Stack,
-  Textarea,
 } from "@mantine/core"
 import { ModalsProvider } from "@mantine/modals"
 // Mantine
@@ -29,6 +28,7 @@ import {
 } from "@xyflow/react"
 import { useCallback } from "react"
 
+import { NodeUserPrompt } from "./components/nodes/user-prompt"
 import { useSettingsStore } from "./stores/settings"
 
 // Custom
@@ -78,7 +78,7 @@ const initialEdges = [
 ]
 
 const nodeTypes = {
-  userInput: UserInputNode,
+  userInput: NodeUserPrompt,
   message: MessageNode,
 }
 
@@ -86,22 +86,9 @@ function MessageNode({ data }: NodeProps<ChatNodeType>) {
   return (
     <>
       <Handle position={Position.Top} type="target" />
-      <div>
+      <Paper withBorder p="md">
         <strong>{data.user}</strong>
         <p>{data.message}</p>
-      </div>
-      <Handle position={Position.Bottom} type="source" />
-    </>
-  )
-}
-
-function UserInputNode({ data }: NodeProps<ChatNodeType>) {
-  return (
-    <>
-      <Handle position={Position.Top} type="target" />
-      <Paper p="md" shadow="xs">
-        <Textarea maxRows={6} minRows={4} />
-        <Button>Send</Button>
       </Paper>
       <Handle position={Position.Bottom} type="source" />
     </>
@@ -154,11 +141,15 @@ export function App() {
                       e.currentTarget as unknown as HTMLFormElement,
                     )
                     const openRouterAPIKey = data.get("openrouter") as string
-                    setAPIKeys({ openRouterAPIKey })
+                    const googleAPIKey = data.get("google") as string
+
+                    console.log(openRouterAPIKey, googleAPIKey)
+
+                    setAPIKeys({ openRouterAPIKey, googleAPIKey })
                   }}
                 >
                   <Input name="openrouter" placeholder="OpenRouter API Key" />
-                  <Input placeholder="Gemini API Key" />
+                  <Input name="google" placeholder="Gemini API Key" />
 
                   <Button mt="auto" type="submit">
                     Save
@@ -171,4 +162,13 @@ export function App() {
       </ModalsProvider>
     </MantineProvider>
   )
+}
+
+export interface MessageNode {
+  id: string
+  model: string
+  system: string
+  message: string
+  role: "user" | "assistant"
+  branches: Array<MessageNode>
 }

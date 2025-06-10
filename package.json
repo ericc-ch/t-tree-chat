@@ -18,6 +18,7 @@
     "*": "bun run lint --fix"
   },
   "dependencies": {
+    "@ai-sdk/google": "^1.2.19",
     "@mantine/code-highlight": "^8.1.0",
     "@mantine/core": "^8.1.0",
     "@mantine/dropzone": "^8.1.0",
