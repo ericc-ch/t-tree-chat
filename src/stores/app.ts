@@ -73,11 +73,17 @@ export interface AppStore extends AppState {
    */
   createUserNode: (message: string, parentId: string) => string
   /**
-   * Creates a new, empty assistant message node as a child of an existing node.
+   * Creates a new empty assistant node as a child of an existing node.
    * @param parentId The ID of the parent node.
    * @returns The ID of the newly created node.
    */
   createAssistantNode: (parentId: string) => string
+  /**
+   * Updates a single node with new data.
+   * @param nodeId The ID of the node to update.
+   * @param data A partial object of the node's properties to update.
+   */
+  updateNode: (nodeId: string, data: Partial<MessageNode>) => void
   /**
    * Sets the currently active conversation tree.
    * @param id The root ID of the conversation tree to set as active.
@@ -177,6 +183,20 @@ export const useAppStore = create<AppStore>()((set) => ({
         nodes: clonedNodes,
         rootNodeIds: [...state.rootNodeIds, node.id],
       }
+    })
+  },
+
+  updateNode: (nodeId: string, data: Partial<MessageNode>) => {
+    set((state) => {
+      const clonedNodes = new Map(state.nodes)
+
+      const node = clonedNodes.get(nodeId)
+      invariant(node, "Node not found")
+
+      const updatedNode = { ...node, ...data }
+      clonedNodes.set(nodeId, updatedNode)
+
+      return { nodes: clonedNodes }
     })
   },
 
