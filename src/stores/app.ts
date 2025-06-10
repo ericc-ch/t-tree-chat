@@ -61,17 +61,17 @@ export interface MessageNode {
 export interface AppStore extends AppState {
   /**
    * Creates a new root node, starting a new conversation tree.
-   * @param message The message content of the root node.
    * @param config The configuration for the new conversation.
+   * @param message The message content of the root node.
    */
-  createRootNode: (message: string, config: MessageNodeConfig) => void
+  createRootNode: (config: MessageNodeConfig, message: string) => void
   /**
    * Creates a new user message node as a child of an existing node.
-   * @param message The message content.
    * @param parentId The ID of the parent node.
+   * @param message The message content.
    * @returns The ID of the newly created node.
    */
-  createUserNode: (message: string, parentId: string) => string
+  createUserNode: (parentId: string, message: string) => string
   /**
    * Creates a new empty assistant node as a child of an existing node.
    * @param parentId The ID of the parent node.
@@ -101,7 +101,7 @@ export const useAppStore = create<AppStore>()((set) => ({
   nodes: new Map(),
   activeConversationRootId: undefined,
 
-  createUserNode: (message: string, parentId: string) => {
+  createUserNode: (parentId: string, message: string) => {
     const nodeId = crypto.randomUUID()
 
     set((state) => {
@@ -164,7 +164,7 @@ export const useAppStore = create<AppStore>()((set) => ({
     return nodeId
   },
 
-  createRootNode: (message: string, config: MessageNodeConfig) => {
+  createRootNode: (config: MessageNodeConfig, message: string) => {
     set((state) => {
       const clonedNodes = new Map(state.nodes)
 
