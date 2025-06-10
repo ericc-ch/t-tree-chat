@@ -1,7 +1,9 @@
 import invariant from "tiny-invariant"
 import { create } from "zustand"
 
-// A map of all nodes, keyed by their ID. This contains nodes from ALL trees.
+/**
+ * A map of all nodes, keyed by their ID. This contains nodes from ALL trees.
+ */
 export type NodesMap = Map<string, MessageNode>
 
 export interface AppState {
@@ -23,20 +25,31 @@ export interface AppState {
   activeConversationRootId?: string
 }
 
+/**
+ * Configuration for generating a response from a message node.
+ */
 export interface MessageNodeConfig {
+  /** The model to use for the response. */
   model: string
+  /** The system prompt to use. */
   system: string
 }
 
+/**
+ * Represents a single message in a conversation tree.
+ */
 export interface MessageNode {
-  // Core properties
+  /** A unique identifier for the node. */
   id: string
+  /** The text content of the message. */
   message: string
+  /** The role of the message author. */
   role: "user" | "assistant"
 
-  // Tree structure links
-  parentId: string | undefined // Link to the parent node
-  childrenIds: Array<string> // Links to all direct replies/branches
+  /** The ID of the parent node. `undefined` if this is a root node. */
+  parentId: string | undefined
+  /** An array of IDs of the direct child nodes. */
+  childrenIds: Array<string>
 
   /**
    * The configuration that will be used to generate children from this node.
@@ -46,13 +59,36 @@ export interface MessageNode {
 }
 
 export interface AppStore extends AppState {
+  /**
+   * Creates a new root node, starting a new conversation tree.
+   * @param message The message content of the root node.
+   * @param config The configuration for the new conversation.
+   */
   createRootNode: (message: string, config: MessageNodeConfig) => void
-  createUserNode: (message: string, parentId: string) => void
-  createAssistantNode: (message: string, parentId: string) => void
+  /**
+   * Creates a new user message node as a child of an existing node.
+   * @param message The message content.
+   * @param parentId The ID of the parent node.
+   * @returns The ID of the newly created node.
+   */
+  createUserNode: (message: string, parentId: string) => string
+  /**
+   * Creates a new, empty assistant message node as a child of an existing node.
+   * @param parentId The ID of the parent node.
+   * @returns The ID of the newly created node.
+   */
+  createAssistantNode: (parentId: string) => string
+  /**
+   * Sets the currently active conversation tree.
+   * @param id The root ID of the conversation tree to set as active.
+   */
   setActiveConversationRootId: (id: string) => void
 }
 
-// This is a function for creating the store
+/**
+ * Zustand store for managing the application state.
+ * This includes all conversation trees and the active conversation.
+ */
 // eslint-disable-next-line max-lines-per-function
 export const useAppStore = create<AppStore>()((set) => ({
   rootNodeIds: [],
