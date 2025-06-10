@@ -71,9 +71,9 @@ function MessageNode({ data }: NodeProps<ChatNodeType>) {
   return (
     <>
       <Handle type="target" position={Position.Top} />
-      <div className="min-w-[150px] rounded-md border border-neutral-300 bg-white p-2.5 text-black">
+      <div>
         <strong>{data.user}</strong>
-        <p className="m-0 mt-1.5 whitespace-pre-wrap">{data.message}</p>
+        <p>{data.message}</p>
       </div>
       <Handle type="source" position={Position.Bottom} />
     </>
@@ -86,10 +86,10 @@ function UserInputNode({ data }: NodeProps<ChatNodeType>) {
   return (
     <>
       <Handle type="target" position={Position.Top} />
-      <div className="min-w-[150px] rounded-md border border-neutral-300 bg-white p-2.5 text-black">
+      <div>
         <strong>{data.user}</strong>
-        <p className="m-0 mt-1.5 whitespace-pre-wrap">{data.message}</p>
-        <div className="mt-2.5">
+        <p>{data.message}</p>
+        <div>
           <Textarea
             value={input}
             onChange={(e) => {
