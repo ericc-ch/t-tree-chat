@@ -7,10 +7,6 @@ import {
   Stack,
 } from "@mantine/core"
 import { ModalsProvider } from "@mantine/modals"
-// Mantine
-import "@mantine/core/styles.layer.css"
-// React Flow
-import "@xyflow/react/dist/style.css"
 import {
   Background,
   BackgroundVariant,
@@ -30,10 +26,16 @@ import {
 import { useCallback } from "react"
 
 import { NodeUserPrompt } from "./components/nodes/user-prompt"
-import { useSettingsStore } from "./stores/settings"
+import { useAppStore } from "./stores/app"
+
+// Mantine
+import "@mantine/core/styles.layer.css"
+// React Flow
+import "@xyflow/react/dist/style.css"
 
 // Custom
-// import "./styles/global.css"
+import "./styles/global.css"
+import { useSettingsStore } from "./stores/settings"
 
 type ChatNodeType = Node<
   {
@@ -100,6 +102,7 @@ function MessageNode({ data }: NodeProps<ChatNodeType>) {
 export function App() {
   const [nodes, , onNodesChange] = useNodesState(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+  const createRootNode = useAppStore((state) => state.createRootNode)
 
   const onConnect = useCallback(
     (params: Edge | Connection) => {
@@ -121,6 +124,15 @@ export function App() {
             onConnect={onConnect}
             onEdgesChange={onEdgesChange}
             onNodesChange={onNodesChange}
+            onPaneClick={() => {
+              createRootNode(
+                {
+                  model: "gemini-1.5-pro",
+                  system: "nevermind",
+                },
+                "Please do something",
+              )
+            }}
           >
             <Background gap={32} variant={BackgroundVariant.Cross} />
             <Controls />

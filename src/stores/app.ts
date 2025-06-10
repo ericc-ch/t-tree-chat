@@ -1,206 +1,179 @@
+import {
+  type Edge,
+  type Node,
+  type OnNodesChange,
+  addEdge,
+  applyNodeChanges,
+} from "@xyflow/react"
 import invariant from "tiny-invariant"
 import { create } from "zustand"
 
-/**
- * A map of all nodes, keyed by their ID. This contains nodes from ALL trees.
- */
-export type NodesMap = Map<string, MessageNode>
+export interface MessageNodeData extends Record<string, unknown> {
+  role: "user" | "assistant"
+  message: string
+  config: MessageNodeConfig
 
-export interface AppState {
-  /**
-   * An array of node IDs. Each ID is the root of a separate conversation tree.
-   */
-  rootNodeIds: Array<string>
-
-  /**
-   * A single, flat map containing every node from every conversation.
-   * This design is highly performant.
-   */
-  nodes: NodesMap
-
-  /**
-   * Optional: The root ID of the currently focused conversation tree,
-   * so your UI knows which one to display.
-   */
-  activeConversationRootId?: string
+  parentId?: string
+  childrenIds: Array<string>
 }
 
-/**
- * Configuration for generating a response from a message node.
- */
+export type UserMessageNode = Node<MessageNodeData, "userMessage">
+export type AssistantMessageNode = Node<MessageNodeData, "assistantMessage">
+
+export type AppNode = UserMessageNode | AssistantMessageNode
+
 export interface MessageNodeConfig {
-  /** The model to use for the response. */
   model: string
-  /** The system prompt to use. */
   system: string
 }
 
-/**
- * Represents a single message in a conversation tree.
- */
-export interface MessageNode {
-  /** A unique identifier for the node. */
-  id: string
-  /** The text content of the message. */
-  message: string
-  /** The role of the message author. */
-  role: "user" | "assistant"
+export interface AppState {
+  nodes: Array<AppNode>
+  edges: Array<Edge>
+  rootNodeIds: Array<string>
+  activeConversationRootId?: string
 
-  /** The ID of the parent node. `undefined` if this is a root node. */
-  parentId: string | undefined
-  /** An array of IDs of the direct child nodes. */
-  childrenIds: Array<string>
+  // React Flow handlers
+  onNodesChange: OnNodesChange<AppNode>
 
-  /**
-   * The configuration that will be used to generate children from this node.
-   * This is inherited from the parent by default when the node is created.
-   */
-  config: MessageNodeConfig
-}
-
-export interface AppStore extends AppState {
-  /**
-   * Creates a new root node, starting a new conversation tree.
-   * @param config The configuration for the new conversation.
-   * @param message The message content of the root node.
-   */
-  createRootNode: (config: MessageNodeConfig, message: string) => void
-  /**
-   * Creates a new user message node as a child of an existing node.
-   * @param parentId The ID of the parent node.
-   * @param message The message content.
-   * @returns The ID of the newly created node.
-   */
+  // Custom chat actions
+  createRootNode: (config: MessageNodeConfig, message: string) => string
   createUserNode: (parentId: string, message: string) => string
-  /**
-   * Creates a new empty assistant node as a child of an existing node.
-   * @param parentId The ID of the parent node.
-   * @returns The ID of the newly created node.
-   */
   createAssistantNode: (parentId: string) => string
-  /**
-   * Updates a single node with new data.
-   * @param nodeId The ID of the node to update.
-   * @param data A partial object of the node's properties to update.
-   */
-  updateNode: (nodeId: string, data: Partial<MessageNode>) => void
-  /**
-   * Sets the currently active conversation tree.
-   * @param id The root ID of the conversation tree to set as active.
-   */
+  updateNodeData: (nodeId: string, data: Partial<MessageNodeData>) => void
   setActiveConversationRootId: (id: string) => void
+
+  // Internal actions
+  _createChildNode: (
+    parentId: string,
+    role: "user" | "assistant",
+    message: string,
+  ) => string
 }
 
-/**
- * Zustand store for managing the application state.
- * This includes all conversation trees and the active conversation.
- */
 // eslint-disable-next-line max-lines-per-function
-export const useAppStore = create<AppStore>()((set) => ({
+export const useAppStore = create<AppState>((set, get) => ({
+  nodes: [],
+  edges: [],
   rootNodeIds: [],
-  nodes: new Map(),
   activeConversationRootId: undefined,
 
-  createUserNode: (parentId: string, message: string) => {
+  // --- REACT FLOW HANDLERS ---
+  onNodesChange: (changes) => {
+    set((state) => ({
+      nodes: applyNodeChanges(changes, state.nodes),
+    }))
+  },
+
+  // --- CUSTOM CHAT ACTIONS ---
+  createRootNode: (config, message) => {
+    const nodeId = crypto.randomUUID()
+    const newNode = {
+      id: nodeId,
+      type: "userMessage",
+      position: { x: 0, y: 0 },
+      data: {
+        role: "user",
+        message,
+        config,
+        parentId: undefined,
+        childrenIds: [],
+      },
+    } satisfies UserMessageNode
+
+    set((state) => ({
+      nodes: [...state.nodes, newNode],
+      rootNodeIds: [...state.rootNodeIds, newNode.id],
+    }))
+
+    return nodeId
+  },
+
+  _createChildNode: (
+    parentId: string,
+    role: "user" | "assistant",
+    message: string,
+  ) => {
     const nodeId = crypto.randomUUID()
 
-    set((state) => {
-      const clonedNodes = new Map(state.nodes)
+    const newEdge: Edge = {
+      id: `e${parentId}-${nodeId}`,
+      source: parentId,
+      target: nodeId,
+    }
 
-      const parentNode = clonedNodes.get(parentId)
-      invariant(parentNode, "Parent node not found")
+    const parentNode = get().nodes.find((node) => node.id === parentId)
+    invariant(parentNode, "Parent node not found")
 
-      const node = {
-        id: nodeId,
+    const newNode = {
+      id: nodeId,
+      type: "userMessage",
+      position: {
+        x: parentNode.position.x,
+        y: parentNode.position.y + 120,
+      },
+      data: {
+        role,
         message,
-        role: "user",
+        config: parentNode.data.config, // Inherit config
         parentId,
         childrenIds: [],
-        config: parentNode.config,
-      } satisfies MessageNode
+      },
+    } satisfies UserMessageNode
 
-      clonedNodes.set(node.id, node)
-      clonedNodes.set(parentId, {
+    set((state) => {
+      const updatedParentNode = {
         ...parentNode,
-        childrenIds: [...parentNode.childrenIds, nodeId],
-      })
+        data: {
+          ...parentNode.data,
+          childrenIds: [...parentNode.data.childrenIds, nodeId],
+        },
+      } satisfies AppNode
 
       return {
-        nodes: clonedNodes,
+        nodes: state.nodes
+          .map((n) => (n.id === parentId ? updatedParentNode : n))
+          .concat(newNode),
+        edges: addEdge(newEdge, state.edges),
       }
     })
 
     return nodeId
+  },
+
+  createUserNode: (parentId: string, message: string) => {
+    return get()._createChildNode(parentId, "user", message)
   },
 
   createAssistantNode: (parentId: string) => {
-    const nodeId = crypto.randomUUID()
+    return get()._createChildNode(parentId, "assistant", "")
+  },
 
-    set((state) => {
-      const clonedNodes = new Map(state.nodes)
+  updateNodeData: (nodeId, newData) => {
+    const updateNodes = get().nodes.map((node) => {
+      if (node.id === nodeId) {
+        const clonedNode = structuredClone(node)
+        clonedNode.data = {
+          ...node.data,
+          ...newData,
+        }
 
-      const parentNode = clonedNodes.get(parentId)
-      invariant(parentNode, "Parent node not found")
-
-      const node: MessageNode = {
-        id: nodeId,
-        message: "",
-        role: "assistant",
-        parentId,
-        childrenIds: [],
-        config: parentNode.config,
+        return clonedNode
       }
 
-      clonedNodes.set(node.id, node)
-
-      clonedNodes.set(parentId, {
-        ...parentNode,
-        childrenIds: [...parentNode.childrenIds, nodeId],
-      })
-
-      return { nodes: clonedNodes }
+      return node
     })
 
-    return nodeId
-  },
-
-  createRootNode: (config: MessageNodeConfig, message: string) => {
-    set((state) => {
-      const clonedNodes = new Map(state.nodes)
-
-      const node = {
-        id: crypto.randomUUID(),
-        message,
-        role: "user",
-        parentId: undefined,
-        childrenIds: [],
-        config,
-      } satisfies MessageNode
-
-      clonedNodes.set(node.id, node)
-
-      return {
-        nodes: clonedNodes,
-        rootNodeIds: [...state.rootNodeIds, node.id],
-      }
+    set({
+      nodes: updateNodes,
     })
   },
 
-  updateNode: (nodeId: string, data: Partial<MessageNode>) => {
-    set((state) => {
-      const clonedNodes = new Map(state.nodes)
-
-      const node = clonedNodes.get(nodeId)
-      invariant(node, "Node not found")
-
-      const updatedNode = { ...node, ...data }
-      clonedNodes.set(nodeId, updatedNode)
-
-      return { nodes: clonedNodes }
-    })
-  },
-
-  setActiveConversationRootId: (id: string) => {
+  setActiveConversationRootId: (id) => {
     set({ activeConversationRootId: id })
   },
 }))
+
+export type CreateChildNode = ReturnType<
+  typeof useAppStore.getState
+>["_createChildNode"]
