@@ -1,13 +1,11 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google"
+import invariant from "tiny-invariant"
 
 import { useSettingsStore } from "../stores/settings"
 
 const getGoogleProvider = () => {
   const apiKey = useSettingsStore.getState().googleAPIKey
-
-  if (!apiKey) {
-    throw new Error("Google API key is not set")
-  }
+  invariant(apiKey, "Google API key is not set")
 
   return createGoogleGenerativeAI({
     apiKey,
