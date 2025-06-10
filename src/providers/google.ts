@@ -1,4 +1,7 @@
-import { createGoogleGenerativeAI } from "@ai-sdk/google"
+import {
+  createGoogleGenerativeAI,
+  type GoogleGenerativeAIProvider,
+} from "@ai-sdk/google"
 import invariant from "tiny-invariant"
 
 import { useSettingsStore } from "../stores/settings"
@@ -12,10 +15,11 @@ const getGoogleProvider = () => {
   })
 }
 
-export const getGoogleModels = () => {
-  const provider = getGoogleProvider()
+type GetGoogleModelParams = Parameters<GoogleGenerativeAIProvider>
+type ModelID = GetGoogleModelParams[0]
+type ModelSettings = GetGoogleModelParams[1]
 
-  return new Map([
-    ["gemini-2.0-flash-lite", provider("gemini-2.0-flash-lite")],
-  ] as const)
+export const getGoogleModel = (model: ModelID, settings?: ModelSettings) => {
+  const provider = getGoogleProvider()
+  return provider(model, settings)
 }

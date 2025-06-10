@@ -1,27 +1,17 @@
 import { Button, Paper, Textarea } from "@mantine/core"
-import { Handle, Position, type Node, type NodeProps } from "@xyflow/react"
+import { Handle, Position, type NodeProps } from "@xyflow/react"
 import { streamText } from "ai"
 
-import { getGoogleModels } from "~/src/providers/google"
+import type { UserMessageNode } from "~/src/stores/app"
 
-export interface UserPrompt {
-  id: string
-  message: string
-  role: "user"
-  config: {
-    model: string
-    system: string
-  }
-  branches: Array<UserPrompt>
-  [key: string]: unknown
-}
+import { getGoogleModel } from "~/src/providers/google"
 
-type NodeUserPromptType = Node<UserPrompt, "userMessage">
-
-export function NodeUserPrompt(props: NodeProps<NodeUserPromptType>) {
+export function UserMessageNode(props: NodeProps<UserMessageNode>) {
   return (
     <>
-      <Handle position={Position.Top} type="target" />
+      {Boolean(props.data.parentId) && (
+        <Handle position={Position.Top} type="target" />
+      )}
       <Paper
         withBorder
         component="form"
@@ -30,8 +20,7 @@ export function NodeUserPrompt(props: NodeProps<NodeUserPromptType>) {
           e.preventDefault()
 
           const { textStream } = streamText({
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            model: getGoogleModels().get("gemini-2.0-flash-lite")!,
+            model: getGoogleModel("gemini-2.0-flash-lite"),
             prompt: "Write a poem about embedding models.",
           })
 
