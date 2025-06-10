@@ -1,7 +1,9 @@
+import { Button, MantineProvider, Paper, Textarea } from "@mantine/core"
 import {
   Background,
   Controls,
   Handle,
+  Panel,
   Position,
   ReactFlow,
   addEdge,
@@ -12,12 +14,14 @@ import {
   type Node,
   type NodeProps,
 } from "@xyflow/react"
-import { useCallback, useState } from "react"
+import { useCallback } from "react"
+// Mantine
+import "@mantine/core/styles.layer.css"
+// React Flow
 import "@xyflow/react/dist/style.css"
 
-import "./styles/global.css"
-import { Button } from "./components/ui/button"
-import { Textarea } from "./components/ui/textarea"
+// Custom
+// import "./styles/global.css"
 
 type ChatNodeType = Node<
   {
@@ -81,25 +85,13 @@ function MessageNode({ data }: NodeProps<ChatNodeType>) {
 }
 
 function UserInputNode({ data }: NodeProps<ChatNodeType>) {
-  const [input, setInput] = useState("")
-
   return (
     <>
       <Handle type="target" position={Position.Top} />
-      <div>
-        <strong>{data.user}</strong>
-        <p>{data.message}</p>
-        <div>
-          <Textarea
-            value={input}
-            onChange={(e) => {
-              setInput(e.target.value)
-            }}
-            rows={2}
-          />
-          <Button>Send</Button>
-        </div>
-      </div>
+      <Paper shadow="xs" p="md">
+        <Textarea minRows={4} maxRows={6} />
+        <Button>Send</Button>
+      </Paper>
       <Handle type="source" position={Position.Bottom} />
     </>
   )
@@ -117,19 +109,21 @@ export function App() {
   )
 
   return (
-    <div className="h-screen w-screen">
-      <ReactFlow
-        colorMode="dark"
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        nodeTypes={nodeTypes}
-      >
-        <Background />
-        <Controls />
-      </ReactFlow>
-    </div>
+    <MantineProvider>
+      <div style={{ width: "100v", height: "100vh" }}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          nodeTypes={nodeTypes}
+        >
+          <Background gap={32} />
+          <Controls />
+          <Panel position="top-left">tonoso</Panel>
+        </ReactFlow>
+      </div>
+    </MantineProvider>
   )
 }
