@@ -1,4 +1,17 @@
-import { Button, MantineProvider, Paper, Textarea } from "@mantine/core"
+import {
+  ActionIcon,
+  Button,
+  Input,
+  MantineProvider,
+  Paper,
+  Stack,
+  Textarea,
+} from "@mantine/core"
+import { ModalsProvider } from "@mantine/modals"
+// Mantine
+import "@mantine/core/styles.layer.css"
+// React Flow
+import "@xyflow/react/dist/style.css"
 import {
   Background,
   Controls,
@@ -15,10 +28,8 @@ import {
   type NodeProps,
 } from "@xyflow/react"
 import { useCallback } from "react"
-// Mantine
-import "@mantine/core/styles.layer.css"
-// React Flow
-import "@xyflow/react/dist/style.css"
+
+import { useSettingsStore } from "./stores/settings"
 
 // Custom
 // import "./styles/global.css"
@@ -74,12 +85,12 @@ const nodeTypes = {
 function MessageNode({ data }: NodeProps<ChatNodeType>) {
   return (
     <>
-      <Handle type="target" position={Position.Top} />
+      <Handle position={Position.Top} type="target" />
       <div>
         <strong>{data.user}</strong>
         <p>{data.message}</p>
       </div>
-      <Handle type="source" position={Position.Bottom} />
+      <Handle position={Position.Bottom} type="source" />
     </>
   )
 }
@@ -87,16 +98,17 @@ function MessageNode({ data }: NodeProps<ChatNodeType>) {
 function UserInputNode({ data }: NodeProps<ChatNodeType>) {
   return (
     <>
-      <Handle type="target" position={Position.Top} />
-      <Paper shadow="xs" p="md">
-        <Textarea minRows={4} maxRows={6} />
+      <Handle position={Position.Top} type="target" />
+      <Paper p="md" shadow="xs">
+        <Textarea maxRows={6} minRows={4} />
         <Button>Send</Button>
       </Paper>
-      <Handle type="source" position={Position.Bottom} />
+      <Handle position={Position.Bottom} type="source" />
     </>
   )
 }
 
+// eslint-disable-next-line max-lines-per-function
 export function App() {
   const [nodes, , onNodesChange] = useNodesState(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
@@ -108,22 +120,55 @@ export function App() {
     [setEdges],
   )
 
+  const setAPIKeys = useSettingsStore((store) => store.setAPIKeys)
+
   return (
     <MantineProvider>
-      <div style={{ width: "100v", height: "100vh" }}>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          nodeTypes={nodeTypes}
-        >
-          <Background gap={32} />
-          <Controls />
-          <Panel position="top-left">tonoso</Panel>
-        </ReactFlow>
-      </div>
+      <ModalsProvider>
+        <div style={{ width: "100v", height: "100vh" }}>
+          <ReactFlow
+            edges={edges}
+            nodes={nodes}
+            nodeTypes={nodeTypes}
+            onConnect={onConnect}
+            onEdgesChange={onEdgesChange}
+            onNodesChange={onNodesChange}
+          >
+            <Background gap={32} />
+            <Controls />
+            <Panel position="top-left">
+              <Paper withBorder p="sm">
+                <ActionIcon variant="outline">⚙️</ActionIcon>
+              </Paper>
+            </Panel>
+
+            <Panel position="center-left">
+              <Paper withBorder h="16rem" p="sm">
+                <Stack
+                  component="form"
+                  h="100%"
+                  onSubmit={(e) => {
+                    e.preventDefault()
+
+                    const data = new FormData(
+                      e.currentTarget as unknown as HTMLFormElement,
+                    )
+                    const openRouterAPIKey = data.get("openrouter") as string
+                    setAPIKeys({ openRouterAPIKey })
+                  }}
+                >
+                  <Input name="openrouter" placeholder="OpenRouter API Key" />
+                  <Input placeholder="Gemini API Key" />
+
+                  <Button mt="auto" type="submit">
+                    Save
+                  </Button>
+                </Stack>
+              </Paper>
+            </Panel>
+          </ReactFlow>
+        </div>
+      </ModalsProvider>
     </MantineProvider>
   )
 }
