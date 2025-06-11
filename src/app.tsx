@@ -1,9 +1,10 @@
-import { MantineProvider } from "@mantine/core"
+import { Button, MantineProvider, Paper } from "@mantine/core"
 import { ModalsProvider } from "@mantine/modals"
 import {
   Background,
   BackgroundVariant,
   Controls,
+  Panel,
   ReactFlow,
 } from "@xyflow/react"
 
@@ -39,20 +40,27 @@ export function App() {
             nodes={nodes}
             nodeTypes={nodeTypes}
             onNodesChange={onNodesChange}
-            onPaneClick={() => {
-              createRootNode(
-                {
-                  model: "gemini-1.5-pro",
-                  system: "nevermind",
-                },
-                "Please do something",
-              )
-            }}
           >
             <Background gap={32} variant={BackgroundVariant.Cross} />
             <Controls />
-
             <Settings />
+            <Panel position="bottom-center">
+              <Paper withBorder p="sm">
+                <Button
+                  onClick={() =>
+                    createRootNode(
+                      {
+                        model: "gpt-3.5-turbo",
+                        system: "You are a helpful assistant",
+                      },
+                      "Hello",
+                    )
+                  }
+                >
+                  New
+                </Button>
+              </Paper>
+            </Panel>
           </ReactFlow>
         </div>
       </ModalsProvider>
