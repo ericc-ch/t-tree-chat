@@ -7,6 +7,7 @@ import {
 } from "@xyflow/react"
 import { streamText } from "ai"
 
+import { GOOGLE_MODELS } from "~/src/lib/constants"
 import { getGoogleModel } from "~/src/providers/google"
 import { useFlowStore, type UserMessageNode } from "~/src/stores/flow"
 
@@ -38,6 +39,7 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
         withBorder
         component="form"
         p="md"
+        shadow="md"
         onSubmit={async (e) => {
           e.preventDefault()
 
@@ -74,13 +76,13 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
           data={[
             {
               group: "Google",
-              items: ["gemini-2.0-flash-lite", "gemini-2.0-flash"],
+              items: GOOGLE_MODELS,
             },
             { group: "OpenRouter", items: ["Express", "Django"] },
           ]}
-          label="Your favorite library"
+          label="Model"
           name="model"
-          placeholder="Pick value"
+          placeholder="Pick a model"
         />
 
         <Button type="submit">Generate</Button>
