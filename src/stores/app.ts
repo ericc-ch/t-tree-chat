@@ -37,7 +37,7 @@ export interface AppState {
   onNodesChange: OnNodesChange<AppNode>
 
   // Custom chat actions
-  createRootNode: (config: MessageNodeConfig, message: string) => string
+  createRootNode: () => string
   createUserNode: (parentId: string, message: string) => string
   createAssistantNode: (parentId: string) => string
   updateNode: (
@@ -50,7 +50,7 @@ export interface AppState {
   _createChildNode: (
     parentId: string,
     role: "user" | "assistant",
-    message: string,
+    type: AppNode["type"],
   ) => string
 }
 
@@ -69,7 +69,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   // --- CUSTOM CHAT ACTIONS ---
-  createRootNode: (config, message) => {
+  createRootNode: () => {
     const nodeId = crypto.randomUUID()
     const newNode = {
       id: nodeId,
@@ -77,8 +77,11 @@ export const useAppStore = create<AppState>((set, get) => ({
       position: { x: 0, y: 0 },
       data: {
         role: "user",
-        message,
-        config,
+        message: "",
+        config: {
+          model: "",
+          system: "",
+        },
         parentId: undefined,
         childrenIds: [],
       },
@@ -92,11 +95,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     return nodeId
   },
 
-  _createChildNode: (
-    parentId: string,
-    role: "user" | "assistant",
-    message: string,
-  ) => {
+  _createChildNode: (parentId, role, type) => {
     const nodeId = crypto.randomUUID()
 
     const newEdge: Edge = {
@@ -110,19 +109,19 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     const newNode = {
       id: nodeId,
-      type: "userMessage",
+      type,
       position: {
         x: parentNode.position.x,
         y: parentNode.position.y + 120,
       },
       data: {
         role,
-        message,
-        config: parentNode.data.config, // Inherit config
+        message: "",
+        config: parentNode.data.config,
         parentId,
         childrenIds: [],
       },
-    } satisfies UserMessageNode
+    } satisfies AppNode
 
     set((state) => {
       const updatedParentNode = {
@@ -144,12 +143,12 @@ export const useAppStore = create<AppState>((set, get) => ({
     return nodeId
   },
 
-  createUserNode: (parentId: string, message: string) => {
-    return get()._createChildNode(parentId, "user", message)
+  createUserNode: (parentId: string) => {
+    return get()._createChildNode(parentId, "user", "userMessage")
   },
 
   createAssistantNode: (parentId: string) => {
-    return get()._createChildNode(parentId, "assistant", "")
+    return get()._createChildNode(parentId, "assistant", "assistantMessage")
   },
 
   updateNode: (nodeId, updater) => {

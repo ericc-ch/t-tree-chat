@@ -46,19 +46,7 @@ export function App() {
             <Settings />
             <Panel position="bottom-center">
               <Paper withBorder p="sm">
-                <Button
-                  onClick={() =>
-                    createRootNode(
-                      {
-                        model: "",
-                        system: "",
-                      },
-                      "",
-                    )
-                  }
-                >
-                  New
-                </Button>
+                <Button onClick={() => createRootNode()}>New</Button>
               </Paper>
             </Panel>
           </ReactFlow>
