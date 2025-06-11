@@ -38,20 +38,19 @@ export interface FlowState {
 
   // Custom chat actions
   createRootNode: () => string
-  createUserNode: (parentId: string, message: string) => string
-  createAssistantNode: (parentId: string) => string
-  updateNode: (
-    nodeId: string,
-    updater: (data: MessageNodeData) => Partial<MessageNodeData>,
-  ) => void
-  setActiveConversationRootId: (id: string) => void
+  createUserNode: (options: { parentId: string }) => string
+  createAssistantNode: (options: { parentId: string }) => string
+  updateNode: (options: {
+    nodeId: string
+    updater: (data: MessageNodeData) => Partial<MessageNodeData>
+  }) => void
+  setActiveConversationRootId: (options: { id: string }) => void
 
   // Internal actions
-  _createChildNode: (
-    parentId: string,
-    role: "user" | "assistant",
-    type: FlowNode["type"],
-  ) => string
+  _createChildNode: (options: {
+    parentId: string
+    type: FlowNode["type"]
+  }) => string
 }
 
 // eslint-disable-next-line max-lines-per-function
@@ -95,7 +94,7 @@ export const useFlowStore = create<FlowState>((set, get) => ({
     return nodeId
   },
 
-  _createChildNode: (parentId, role, type) => {
+  _createChildNode: ({ parentId, type }) => {
     const nodeId = crypto.randomUUID()
 
     const newEdge: Edge = {
@@ -115,7 +114,7 @@ export const useFlowStore = create<FlowState>((set, get) => ({
         y: parentNode.position.y + 120,
       },
       data: {
-        role,
+        role: type === "assistantMessage" ? "assistant" : "user",
         message: "",
         config: parentNode.data.config,
         parentId,
@@ -143,15 +142,21 @@ export const useFlowStore = create<FlowState>((set, get) => ({
     return nodeId
   },
 
-  createUserNode: (parentId: string) => {
-    return get()._createChildNode(parentId, "user", "userMessage")
+  createUserNode: ({ parentId }) => {
+    return get()._createChildNode({
+      parentId,
+      type: "userMessage",
+    })
   },
 
-  createAssistantNode: (parentId: string) => {
-    return get()._createChildNode(parentId, "assistant", "assistantMessage")
+  createAssistantNode: ({ parentId }) => {
+    return get()._createChildNode({
+      parentId,
+      type: "assistantMessage",
+    })
   },
 
-  updateNode: (nodeId, updater) => {
+  updateNode: ({ nodeId, updater }) => {
     const updateNodes = get().nodes.map((node) => {
       if (node.id === nodeId) {
         const clonedNode = structuredClone(node)
@@ -173,11 +178,7 @@ export const useFlowStore = create<FlowState>((set, get) => ({
     })
   },
 
-  setActiveConversationRootId: (id) => {
+  setActiveConversationRootId: ({ id }) => {
     set({ activeConversationRootId: id })
   },
 }))
-
-export type CreateChildNode = ReturnType<
-  typeof useFlowStore.getState
->["_createChildNode"]
