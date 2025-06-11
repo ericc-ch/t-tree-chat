@@ -8,14 +8,14 @@ import {
 import { streamText } from "ai"
 
 import { getGoogleModel } from "~/src/providers/google"
-import { useAppStore, type UserMessageNode } from "~/src/stores/app"
+import { useFlowStore, type UserMessageNode } from "~/src/stores/flow"
 
 // eslint-disable-next-line max-lines-per-function
 export function UserMessageNode(props: NodeProps<UserMessageNode>) {
   const updateNodeInternals = useUpdateNodeInternals()
 
-  const createAssistantNode = useAppStore((state) => state.createAssistantNode)
-  const updateNode = useAppStore((state) => state.updateNode)
+  const createAssistantNode = useFlowStore((state) => state.createAssistantNode)
+  const updateNode = useFlowStore((state) => state.updateNode)
 
   // Child node means it's not a root node
   const isChildNode = Boolean(props.data.parentId)

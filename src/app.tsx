@@ -10,7 +10,7 @@ import {
 
 import { UserMessageNode } from "./components/nodes/user-message"
 import { Settings } from "./components/panels/settings"
-import { useAppStore } from "./stores/app"
+import { useFlowStore } from "./stores/flow"
 
 // Mantine
 import "@mantine/core/styles.layer.css"
@@ -25,11 +25,11 @@ const nodeTypes = {
 }
 
 export function App() {
-  const nodes = useAppStore((state) => state.nodes)
-  const edges = useAppStore((state) => state.edges)
+  const nodes = useFlowStore((state) => state.nodes)
+  const edges = useFlowStore((state) => state.edges)
 
-  const onNodesChange = useAppStore((state) => state.onNodesChange)
-  const createRootNode = useAppStore((state) => state.createRootNode)
+  const onNodesChange = useFlowStore((state) => state.onNodesChange)
+  const createRootNode = useFlowStore((state) => state.createRootNode)
 
   return (
     <MantineProvider>
@@ -39,6 +39,7 @@ export function App() {
             edges={edges}
             nodes={nodes}
             nodeTypes={nodeTypes}
+            onContextMenu={() => false}
             onNodesChange={onNodesChange}
           >
             <Background gap={32} variant={BackgroundVariant.Cross} />

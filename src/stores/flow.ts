@@ -20,21 +20,21 @@ export interface MessageNodeData extends Record<string, unknown> {
 export type UserMessageNode = Node<MessageNodeData, "userMessage">
 export type AssistantMessageNode = Node<MessageNodeData, "assistantMessage">
 
-export type AppNode = UserMessageNode | AssistantMessageNode
+export type FlowNode = UserMessageNode | AssistantMessageNode
 
 export interface MessageNodeConfig {
   model: string
   system: string
 }
 
-export interface AppState {
-  nodes: Array<AppNode>
+export interface FlowState {
+  nodes: Array<FlowNode>
   edges: Array<Edge>
   rootNodeIds: Array<string>
   activeConversationRootId?: string
 
   // React Flow handlers
-  onNodesChange: OnNodesChange<AppNode>
+  onNodesChange: OnNodesChange<FlowNode>
 
   // Custom chat actions
   createRootNode: () => string
@@ -50,12 +50,12 @@ export interface AppState {
   _createChildNode: (
     parentId: string,
     role: "user" | "assistant",
-    type: AppNode["type"],
+    type: FlowNode["type"],
   ) => string
 }
 
 // eslint-disable-next-line max-lines-per-function
-export const useAppStore = create<AppState>((set, get) => ({
+export const useFlowStore = create<FlowState>((set, get) => ({
   nodes: [],
   edges: [],
   rootNodeIds: [],
@@ -121,7 +121,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         parentId,
         childrenIds: [],
       },
-    } satisfies AppNode
+    } satisfies FlowNode
 
     set((state) => {
       const updatedParentNode = {
@@ -130,7 +130,7 @@ export const useAppStore = create<AppState>((set, get) => ({
           ...parentNode.data,
           childrenIds: [...parentNode.data.childrenIds, nodeId],
         },
-      } satisfies AppNode
+      } satisfies FlowNode
 
       return {
         nodes: state.nodes
@@ -179,5 +179,5 @@ export const useAppStore = create<AppState>((set, get) => ({
 }))
 
 export type CreateChildNode = ReturnType<
-  typeof useAppStore.getState
+  typeof useFlowStore.getState
 >["_createChildNode"]

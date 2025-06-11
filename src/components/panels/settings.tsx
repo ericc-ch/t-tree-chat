@@ -1,10 +1,27 @@
-import { Button, Input, Paper, Stack } from "@mantine/core"
+import { Button, Group, Input, Paper, Stack } from "@mantine/core"
 import { Panel } from "@xyflow/react"
+import { useState } from "react"
 
 import { useSettingsStore } from "~/src/stores/settings"
 
+// eslint-disable-next-line max-lines-per-function
 export function Settings() {
+  const [isOpen, setIsOpen] = useState(false)
   const setAPIKeys = useSettingsStore((store) => store.setAPIKeys)
+
+  if (!isOpen) {
+    return (
+      <Panel position="center-left">
+        <Button
+          onClick={() => {
+            setIsOpen(true)
+          }}
+        >
+          Settings
+        </Button>
+      </Panel>
+    )
+  }
 
   return (
     <Panel position="center-left">
@@ -29,9 +46,17 @@ export function Settings() {
           <Input name="openrouter" placeholder="OpenRouter API Key" />
           <Input name="google" placeholder="Gemini API Key" />
 
-          <Button mt="auto" type="submit">
-            Save
-          </Button>
+          <Group mt="auto">
+            <Button type="submit">Save</Button>
+            <Button
+              variant="default"
+              onClick={() => {
+                setIsOpen(false)
+              }}
+            >
+              Close
+            </Button>
+          </Group>
         </Stack>
       </Paper>
     </Panel>
