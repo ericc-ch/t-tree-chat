@@ -1,5 +1,10 @@
 import { Button, Paper, Select, Textarea } from "@mantine/core"
-import { Handle, Position, type NodeProps } from "@xyflow/react"
+import {
+  Handle,
+  Position,
+  useUpdateNodeInternals,
+  type NodeProps,
+} from "@xyflow/react"
 import { streamText } from "ai"
 
 import { getGoogleModel } from "~/src/providers/google"
@@ -7,14 +12,28 @@ import { useAppStore, type UserMessageNode } from "~/src/stores/app"
 
 // eslint-disable-next-line max-lines-per-function
 export function UserMessageNode(props: NodeProps<UserMessageNode>) {
+  const updateNodeInternals = useUpdateNodeInternals()
+
   const createAssistantNode = useAppStore((state) => state.createAssistantNode)
   const updateNode = useAppStore((state) => state.updateNode)
 
+  // Child node means it's not a root node
+  const isChildNode = Boolean(props.data.parentId)
+  const hasChild = props.data.childrenIds.length > 0
+
   return (
     <>
-      {Boolean(props.data.parentId) && (
-        <Handle position={Position.Top} type="target" />
+      {isChildNode && (
+        <Handle isConnectable={false} position={Position.Top} type="target" />
       )}
+      {hasChild && (
+        <Handle
+          isConnectable={false}
+          position={Position.Bottom}
+          type="source"
+        />
+      )}
+
       <Paper
         withBorder
         component="form"
@@ -30,6 +49,7 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
           const prompt = formData.get("prompt") as string
 
           const childId = createAssistantNode(props.id)
+          updateNodeInternals(props.id)
 
           const { textStream } = streamText({
             model: getGoogleModel(model),
@@ -65,7 +85,6 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
 
         <Button type="submit">Generate</Button>
       </Paper>
-      <Handle position={Position.Bottom} type="source" />
     </>
   )
 }
