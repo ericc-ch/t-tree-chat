@@ -50,10 +50,10 @@ export function App() {
                   onClick={() =>
                     createRootNode(
                       {
-                        model: "gpt-3.5-turbo",
-                        system: "You are a helpful assistant",
+                        model: "",
+                        system: "",
                       },
-                      "Hello",
+                      "",
                     )
                   }
                 >

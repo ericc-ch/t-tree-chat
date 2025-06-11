@@ -40,7 +40,10 @@ export interface AppState {
   createRootNode: (config: MessageNodeConfig, message: string) => string
   createUserNode: (parentId: string, message: string) => string
   createAssistantNode: (parentId: string) => string
-  updateNode: (nodeId: string, data: Partial<MessageNodeData>) => void
+  updateNode: (
+    nodeId: string,
+    updater: (data: MessageNodeData) => Partial<MessageNodeData>,
+  ) => void
   setActiveConversationRootId: (id: string) => void
 
   // Internal actions
@@ -149,12 +152,14 @@ export const useAppStore = create<AppState>((set, get) => ({
     return get()._createChildNode(parentId, "assistant", "")
   },
 
-  updateNode: (nodeId, newData) => {
+  updateNode: (nodeId, updater) => {
     const updateNodes = get().nodes.map((node) => {
       if (node.id === nodeId) {
         const clonedNode = structuredClone(node)
+        const newData = updater(clonedNode.data)
+
         clonedNode.data = {
-          ...node.data,
+          ...clonedNode.data,
           ...newData,
         }
 
