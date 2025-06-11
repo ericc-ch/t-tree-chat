@@ -43,6 +43,7 @@
   },
   "trustedDependencies": [
     "@swc/core",
+    "simple-git-hooks",
   ],
   "packages": {
     "@ai-sdk/google": ["@ai-sdk/google@1.2.19", "", { "dependencies": { "@ai-sdk/provider": "1.1.3", "@ai-sdk/provider-utils": "2.2.8" }, "peerDependencies": { "zod": "^3.0.0" } }, "sha512-Xgl6eftIRQ4srUdCzxM112JuewVMij5q4JLcNmHcB68Bxn9dpr3MVUSPlJwmameuiQuISIA8lMB+iRiRbFsaqA=="],

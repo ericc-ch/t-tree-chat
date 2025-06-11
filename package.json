@@ -54,6 +54,7 @@
     "vite-tsconfig-paths": "^5.1.4"
   },
   "trustedDependencies": [
-    "@swc/core"
+    "@swc/core",
+    "simple-git-hooks"
   ]
 }
