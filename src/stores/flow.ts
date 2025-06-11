@@ -2,6 +2,7 @@ import {
   type Edge,
   type Node,
   type OnNodesChange,
+  type XYPosition,
   addEdge,
   applyNodeChanges,
 } from "@xyflow/react"
@@ -37,7 +38,7 @@ export interface FlowState {
   onNodesChange: OnNodesChange<FlowNode>
 
   // Custom chat actions
-  createRootNode: () => string
+  createRootNode: (options: { position: XYPosition }) => string
   createUserNode: (options: { parentId: string }) => string
   createAssistantNode: (options: { parentId: string }) => string
   updateNode: (options: {
@@ -68,12 +69,12 @@ export const useFlowStore = create<FlowState>((set, get) => ({
   },
 
   // --- CUSTOM CHAT ACTIONS ---
-  createRootNode: () => {
+  createRootNode: ({ position }) => {
     const nodeId = crypto.randomUUID()
     const newNode = {
       id: nodeId,
       type: "userMessage",
-      position: { x: 0, y: 0 },
+      position,
       data: {
         role: "user",
         message: "",
@@ -98,7 +99,7 @@ export const useFlowStore = create<FlowState>((set, get) => ({
     const nodeId = crypto.randomUUID()
 
     const newEdge: Edge = {
-      id: `e${parentId}-${nodeId}`,
+      id: `${parentId}>${nodeId}`,
       source: parentId,
       target: nodeId,
     }
@@ -108,7 +109,6 @@ export const useFlowStore = create<FlowState>((set, get) => ({
 
     const newNode = {
       id: nodeId,
-      type,
       position: {
         x: parentNode.position.x,
         y: parentNode.position.y + 120,
