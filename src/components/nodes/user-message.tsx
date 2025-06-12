@@ -1,4 +1,16 @@
-import { Button, Paper, Select, Textarea } from "@mantine/core"
+import { Icon } from "@iconify/react"
+import {
+  ActionIcon,
+  Collapse,
+  Divider,
+  Group,
+  Paper,
+  Select,
+  Stack,
+  Text,
+  Textarea,
+} from "@mantine/core"
+import { useDisclosure } from "@mantine/hooks"
 import {
   Handle,
   Position,
@@ -21,6 +33,8 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
   // Child node means it's not a root node
   const isChildNode = Boolean(props.data.parentId)
   const hasChild = props.data.childrenIds.length > 0
+
+  const [opened, { toggle }] = useDisclosure(false)
 
   return (
     <>
@@ -65,27 +79,51 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
           }
         }}
       >
-        <Textarea
-          defaultValue={props.data.message}
-          maxRows={6}
-          minRows={4}
-          name="prompt"
-        />
+        <Stack gap="sm">
+          <Textarea
+            defaultValue={props.data.message}
+            maxRows={6}
+            minRows={4}
+            name="prompt"
+          />
 
-        <Select
-          data={[
-            {
-              group: "Google",
-              items: GOOGLE_MODELS,
-            },
-            { group: "OpenRouter", items: ["Express", "Django"] },
-          ]}
-          label="Model"
-          name="model"
-          placeholder="Pick a model"
-        />
+          <Group align="end" gap="xs">
+            <Select
+              data={[
+                {
+                  group: "Google",
+                  items: GOOGLE_MODELS,
+                },
+                { group: "OpenRouter", items: ["Express", "Django"] },
+              ]}
+              name="model"
+              placeholder="Pick a model"
+            />
 
-        <Button type="submit">Generate</Button>
+            <ActionIcon size="input-sm" type="submit">
+              <Icon icon="mingcute:ai-fill" />
+            </ActionIcon>
+          </Group>
+
+          <Divider my="sm" />
+
+          <Group gap="xs">
+            <ActionIcon color="red" variant="outline">
+              <Icon icon="mingcute:delete-fill" />
+            </ActionIcon>
+            <ActionIcon ml="auto" variant="outline">
+              <Icon icon="mingcute:git-branch-fill" />
+            </ActionIcon>
+
+            <ActionIcon variant="outline" onClick={toggle}>
+              <Icon icon="mingcute:arrows-down-fill" />
+            </ActionIcon>
+          </Group>
+
+          <Collapse in={opened}>
+            <Text>WOWZO ANJAY</Text>
+          </Collapse>
+        </Stack>
       </Paper>
     </>
   )
