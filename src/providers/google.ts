@@ -1,3 +1,5 @@
+import type { ComboboxItem } from "@mantine/core"
+
 import {
   createGoogleGenerativeAI,
   type GoogleGenerativeAIProvider,
@@ -23,3 +25,14 @@ export const getGoogleModel = (model: ModelID, settings?: ModelSettings) => {
   const provider = getGoogleProvider()
   return provider(model, settings)
 }
+
+export const GOOGLE_MODELS: Array<ComboboxItem> = [
+  {
+    value: "gemini-2.0-flash-lite",
+    label: "Gemini 2.0 Flash Lite",
+  },
+  {
+    value: "gemini-2.0-flash",
+    label: "Gemini 2.0 Flash",
+  },
+]

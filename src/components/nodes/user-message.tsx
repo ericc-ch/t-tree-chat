@@ -1,11 +1,13 @@
 import { Icon } from "@iconify/react"
 import {
   ActionIcon,
-  Collapse,
+  Box,
   Divider,
   Group,
+  NumberInput,
   Paper,
   Select,
+  Slider,
   Stack,
   Text,
   Textarea,
@@ -18,10 +20,14 @@ import {
   type NodeProps,
 } from "@xyflow/react"
 import { streamText } from "ai"
+import clsx from "clsx"
+import { useState } from "react"
 
-import { GOOGLE_MODELS } from "~/src/lib/constants"
-import { getGoogleModel } from "~/src/providers/google"
+import { MODEL_OPTIONS } from "~/src/lib/constants"
+import { getGoogleModel, GOOGLE_MODELS } from "~/src/providers/google"
 import { useFlowStore, type UserMessageNode } from "~/src/stores/flow"
+
+import classes from "./user-message.module.css"
 
 // eslint-disable-next-line max-lines-per-function
 export function UserMessageNode(props: NodeProps<UserMessageNode>) {
@@ -35,6 +41,8 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
   const hasChild = props.data.childrenIds.length > 0
 
   const [opened, { toggle }] = useDisclosure(false)
+
+  const [temp, setTemp] = useState(0.5)
 
   return (
     <>
@@ -70,6 +78,11 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
           const { textStream } = streamText({
             model: getGoogleModel(model),
             prompt,
+            providerOptions: {
+              thinkingConfig: {
+                thinkingBudget: 0,
+              },
+            },
           })
 
           for await (const textPart of textStream) {
@@ -81,21 +94,19 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
       >
         <Stack gap="sm">
           <Textarea
+            autosize
             defaultValue={props.data.message}
+            label="User Prompt"
             maxRows={6}
             minRows={4}
             name="prompt"
+            placeholder="Type your prompt here..."
           />
 
           <Group align="end" gap="xs">
             <Select
-              data={[
-                {
-                  group: "Google",
-                  items: GOOGLE_MODELS,
-                },
-                { group: "OpenRouter", items: ["Express", "Django"] },
-              ]}
+              data={MODEL_OPTIONS}
+              defaultValue={GOOGLE_MODELS[0].value}
               name="model"
               placeholder="Pick a model"
             />
@@ -105,24 +116,79 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
             </ActionIcon>
           </Group>
 
-          <Divider my="sm" />
+          <Divider />
 
-          <Group gap="xs">
-            <ActionIcon color="red" variant="outline">
-              <Icon icon="mingcute:delete-fill" />
-            </ActionIcon>
-            <ActionIcon ml="auto" variant="outline">
-              <Icon icon="mingcute:git-branch-fill" />
-            </ActionIcon>
+          <Stack gap={0}>
+            <Group gap="xs">
+              <ActionIcon color="red" variant="outline">
+                <Icon icon="mingcute:delete-fill" />
+              </ActionIcon>
+              <ActionIcon ml="auto" variant="outline">
+                <Icon icon="mingcute:git-branch-fill" />
+              </ActionIcon>
 
-            <ActionIcon variant="outline" onClick={toggle}>
-              <Icon icon="mingcute:arrows-down-fill" />
-            </ActionIcon>
-          </Group>
+              <ActionIcon
+                variant={opened ? "filled" : "outline"}
+                onClick={toggle}
+              >
+                <Icon
+                  className={clsx(classes.moreOptionsButton, {
+                    [classes.moreOptionsButtonActive]: opened,
+                  })}
+                  icon="mingcute:arrows-down-fill"
+                />
+              </ActionIcon>
+            </Group>
 
-          <Collapse in={opened}>
-            <Text>WOWZO ANJAY</Text>
-          </Collapse>
+            {opened && (
+              <Stack gap="sm" py="md">
+                <Textarea
+                  autosize
+                  defaultValue={props.data.config.system}
+                  label="System Prompt"
+                  maxRows={6}
+                  minRows={4}
+                  name="prompt"
+                  placeholder="Optional tone and style instructions for the model"
+                />
+
+                <Box>
+                  <Text size="sm">Temperature</Text>
+                  <Group>
+                    <Slider
+                      // React flow utility classes
+                      // https://reactflow.dev/learn/customization/custom-nodes#nodrag
+                      className="nodrag"
+                      color="blue"
+                      defaultValue={40}
+                      marks={[
+                        { value: 0.25, label: "0.25" },
+                        { value: 0.5, label: "0.5" },
+                        { value: 0.75, label: "0.75" },
+                      ]}
+                      max={1}
+                      min={0}
+                      name="temperature"
+                      step={0.05}
+                      value={temp}
+                      onChange={setTemp}
+                    />
+                    <NumberInput
+                      max={1}
+                      min={0}
+                      name="temperature"
+                      step={0.05}
+                      style={{ width: "4rem" }}
+                      value={temp}
+                      onChange={(value) => {
+                        setTemp(Number.parseFloat(value.toString()))
+                      }}
+                    />
+                  </Group>
+                </Box>
+              </Stack>
+            )}
+          </Stack>
         </Stack>
       </Paper>
     </>

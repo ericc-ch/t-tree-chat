@@ -43,7 +43,7 @@ function Main() {
         <ReactFlow
           zoomOnDoubleClick
           edges={edges}
-          nodeOrigin={[0.5, 0.5]}
+          nodeOrigin={[0.5, 0]}
           nodes={nodes}
           nodeTypes={nodeTypes}
           panOnDrag={false}
