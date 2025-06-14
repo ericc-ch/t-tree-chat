@@ -9,10 +9,10 @@ import {
 import invariant from "tiny-invariant"
 import { create } from "zustand"
 
+import { GOOGLE_MODELS } from "../providers/google"
+
 export interface MessageNodeData extends Record<string, unknown> {
-  role: "user" | "assistant"
-  message: string
-  config: MessageNodeConfig
+  config: GenerationConfig
 
   parentId?: string
   childrenIds: Array<string>
@@ -23,9 +23,13 @@ export type AssistantMessageNode = Node<MessageNodeData, "assistantMessage">
 
 export type FlowNode = UserMessageNode | AssistantMessageNode
 
-export interface MessageNodeConfig {
+export interface GenerationConfig {
+  userPrompt: string
   model: string
-  system: string
+  systemPrompt: string
+  temperature: number
+  thinkingMode: boolean
+  thinkingBudget: number
 }
 
 export interface FlowState {
@@ -71,21 +75,23 @@ export const useFlowStore = create<FlowState>((set, get) => ({
   // --- CUSTOM CHAT ACTIONS ---
   createRootNode: ({ position }) => {
     const nodeId = crypto.randomUUID()
-    const newNode = {
+    const newNode: UserMessageNode = {
       id: nodeId,
       type: "userMessage",
       position,
       data: {
-        role: "user",
-        message: "",
         config: {
-          model: "",
-          system: "",
+          userPrompt: "",
+          model: GOOGLE_MODELS[0].value,
+          systemPrompt: "",
+          temperature: 0.5,
+          thinkingMode: false,
+          thinkingBudget: 0,
         },
         parentId: undefined,
         childrenIds: [],
       },
-    } satisfies UserMessageNode
+    }
 
     set((state) => ({
       nodes: [...state.nodes, newNode],
@@ -105,31 +111,30 @@ export const useFlowStore = create<FlowState>((set, get) => ({
     }
 
     const parentNode = get().nodes.find((node) => node.id === parentId)
-    invariant(parentNode, "Parent node not found")
+    invariant(parentNode, `Parent node not found for ${parentId}`)
 
-    const newNode = {
+    const newNode: FlowNode = {
       id: nodeId,
+      type,
       position: {
         x: parentNode.position.x,
-        y: parentNode.position.y + 120,
+        y: parentNode.position.y + 400,
       },
       data: {
-        role: type === "assistantMessage" ? "assistant" : "user",
-        message: "",
         config: parentNode.data.config,
         parentId,
         childrenIds: [],
       },
-    } satisfies FlowNode
+    }
 
     set((state) => {
-      const updatedParentNode = {
+      const updatedParentNode: FlowNode = {
         ...parentNode,
         data: {
           ...parentNode.data,
           childrenIds: [...parentNode.data.childrenIds, nodeId],
         },
-      } satisfies FlowNode
+      }
 
       return {
         nodes: state.nodes
@@ -180,5 +185,24 @@ export const useFlowStore = create<FlowState>((set, get) => ({
 
   setActiveConversationRootId: ({ id }) => {
     set({ activeConversationRootId: id })
+  },
+
+  getAncestors: (nodeId: string) => {
+    const ancestors: Array<FlowNode> = []
+    const { nodes } = get()
+
+    let currentNode = nodes.find((n) => n.id === nodeId)
+
+    while (currentNode?.data.parentId) {
+      const parentNode = nodes.find((n) => n.id === currentNode.data.parentId)
+      if (parentNode) {
+        ancestors.unshift(parentNode)
+        currentNode = parentNode
+      } else {
+        break
+      }
+    }
+
+    return ancestors
   },
 }))
