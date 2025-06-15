@@ -12,6 +12,8 @@ import {
 
 import type { AdvancedModelSettings } from "~/src/providers/types"
 
+import { GENERATION_CONFIG_KEYS } from "~/src/lib/constants"
+
 interface FieldProps<T> {
   defaultValue: T
 }
@@ -23,7 +25,7 @@ const SystemPrompt = ({ defaultValue }: FieldProps<string>) => (
     label="System prompt"
     maxRows={6}
     minRows={4}
-    name="systemPrompt"
+    name={GENERATION_CONFIG_KEYS.SYSTEM_PROMPT}
     placeholder="Optional tone and style instructions for the model"
   />
 )
@@ -45,7 +47,7 @@ const Temperature = ({ defaultValue }: FieldProps<number>) => (
         ]}
         max={1}
         min={0}
-        name="temperature"
+        name={GENERATION_CONFIG_KEYS.TEMPERATURE}
         step={0.05}
       />
     </Stack>
@@ -54,7 +56,11 @@ const Temperature = ({ defaultValue }: FieldProps<number>) => (
 )
 
 const ThinkingMode = ({ defaultValue }: FieldProps<boolean>) => (
-  <Switch defaultChecked={defaultValue} label="Thinking mode" />
+  <Switch
+    defaultChecked={defaultValue}
+    label="Thinking mode"
+    name={GENERATION_CONFIG_KEYS.THINKING_MODE}
+  />
 )
 
 const ThinkingBudget = ({ defaultValue }: FieldProps<number>) => (
@@ -63,7 +69,7 @@ const ThinkingBudget = ({ defaultValue }: FieldProps<number>) => (
     label="Thinking budget"
     max={24576}
     min={0}
-    name="thinkingBudget"
+    name={GENERATION_CONFIG_KEYS.THINKING_BUDGET}
   />
 )
 

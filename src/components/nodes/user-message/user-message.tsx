@@ -23,7 +23,8 @@ import invariant from "tiny-invariant"
 
 import type { AdvancedModelSettings } from "~/src/providers/types"
 
-import { MODEL_OPTIONS } from "~/src/lib/constants"
+import { GENERATION_CONFIG_KEYS, MODEL_OPTIONS } from "~/src/lib/constants"
+import { buildMessages } from "~/src/lib/utils"
 import {
   getGoogleModel,
   GOOGLE_MODEL_AVAILABLE_SETTINGS,
@@ -37,7 +38,9 @@ import classes from "./user-message.module.css"
 export function UserMessageNode(props: NodeProps<UserMessageNode>) {
   const updateNodeInternals = useUpdateNodeInternals()
 
+  // const getAncestors = useFlowStore((state) => state.getAncestors)
   const createAssistantNode = useFlowStore((state) => state.createAssistantNode)
+  const deleteNode = useFlowStore((state) => state.deleteNode)
   const updateNode = useFlowStore((state) => state.updateNode)
 
   // Child node means it's not a root node
@@ -83,25 +86,34 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
           )
 
           const model = formData.get("model") as string
-          const prompt = formData.get("prompt") as string
 
           const childId = createAssistantNode({ parentId: props.id })
           updateNodeInternals(props.id)
 
-          const { textStream } = streamText({
-            model: getGoogleModel(model),
-            prompt,
-            providerOptions: {
-              thinkingConfig: {
-                thinkingBudget: 0,
-              },
-            },
-          })
+          if (props.parentId) {
+            // Stub
+          } else {
+            // This means this is a root node
+            const messages = buildMessages([props])
 
-          for await (const textPart of textStream) {
-            updateNode(childId, (data) => ({
-              message: data.message + textPart,
-            }))
+            const { textStream } = streamText({
+              model: getGoogleModel(model),
+              messages,
+              providerOptions: {
+                thinkingConfig: {
+                  thinkingBudget: 0,
+                },
+              },
+            })
+
+            for await (const textPart of textStream) {
+              updateNode({
+                nodeId: childId,
+                updater: (data) => ({
+                  message: data.config.userPrompt + textPart,
+                }),
+              })
+            }
           }
         }}
       >
@@ -112,7 +124,7 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
             label="User prompt"
             maxRows={6}
             minRows={4}
-            name="userPrompt"
+            name={GENERATION_CONFIG_KEYS.USER_PROMPT}
             placeholder="Type your prompt here..."
           />
 
@@ -127,7 +139,7 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
             <Select
               allowDeselect={false}
               data={MODEL_OPTIONS}
-              name="model"
+              name={GENERATION_CONFIG_KEYS.MODEL}
               placeholder="Pick a model"
               value={selectedModel}
               onChange={(value) => {
@@ -136,7 +148,12 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
               }}
             />
 
-            <ActionIcon size="input-sm" type="submit">
+            <ActionIcon
+              aria-label="Generate response"
+              size="input-sm"
+              title="Generate response"
+              type="submit"
+            >
               <Icon icon="mingcute:ai-fill" />
             </ActionIcon>
           </Box>
@@ -145,14 +162,26 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
 
           <Stack gap={0}>
             <Group gap="xs">
-              <ActionIcon color="red" variant="outline">
+              <ActionIcon
+                aria-label="Delete node"
+                color="red"
+                title="Delete node"
+                variant="outline"
+              >
                 <Icon icon="mingcute:delete-fill" />
               </ActionIcon>
-              <ActionIcon ml="auto" variant="outline">
+              <ActionIcon
+                aria-label="Duplicate node"
+                ml="auto"
+                title="Duplicate node"
+                variant="outline"
+              >
                 <Icon icon="mingcute:git-branch-fill" />
               </ActionIcon>
 
               <ActionIcon
+                aria-label="More options"
+                title="More options"
                 variant={opened ? "filled" : "outline"}
                 onClick={toggle}
               >
@@ -189,36 +218,4 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
       </Paper>
     </>
   )
-}
-
-export interface MessageNode {
-  // Core properties
-  id: string
-  message: string
-  role: "user" | "assistant"
-
-  // Tree structure links
-  parentId: string | null // ID of the parent node, `null` for the root
-  childrenIds: Array<string> // IDs of the direct children/replies
-
-  // Generation config
-  // This config was used to generate this node's children.
-  // It's most relevant on `user` nodes.
-  config?: {
-    model: string
-    system: string
-  }
-}
-
-export interface ChatState {
-  // The ID of the very first message in the entire tree
-  rootNodeId: string
-
-  // A flat map of all message nodes in the chat
-  nodes: {
-    [nodeId: string]: MessageNode
-  }
-
-  // Optional: To easily track the user's current position
-  activeNodeId: string
 }

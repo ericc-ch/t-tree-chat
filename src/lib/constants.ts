@@ -10,6 +10,7 @@ export const MODEL_OPTIONS: Array<ComboboxItemGroup> = [
 
 export const GENERATION_CONFIG_KEYS = {
   USER_PROMPT: "userPrompt",
+  MODEL: "model",
   SYSTEM_PROMPT: "systemPrompt",
   TEMPERATURE: "temperature",
   THINKING_MODE: "thinkingMode",

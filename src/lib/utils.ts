@@ -1,6 +1,13 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import type { CoreMessage } from "ai"
 
-export function cn(...inputs: Array<ClassValue>) {
-  return twMerge(clsx(inputs))
-}
+import type { FlowNode } from "../stores/flow"
+
+export const buildMessages = (
+  nodes: Array<Pick<FlowNode, "type" | "data">>,
+): Array<CoreMessage> =>
+  nodes.map((node) => {
+    return {
+      role: node.type === "userMessage" ? "user" : "assistant",
+      content: node.data.config.userPrompt,
+    }
+  })

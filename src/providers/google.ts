@@ -104,7 +104,7 @@ export const GOOGLE_MODEL_OPTIONS_PARSERS: Map<GoogleModelID, OptionsParser> =
         const temperature = Number.parseFloat(temperatureString)
 
         return {
-          prompt: formData.get("prompt") as string,
+          model: getGoogleModel("gemini-2.5-flash-preview-05-20"),
           system: formData.get("systemPrompt") as string,
           temperature,
           providerOptions: {
