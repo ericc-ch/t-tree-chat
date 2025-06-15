@@ -68,9 +68,9 @@ export const useFlowStore = create<FlowState>((set, get) => ({
 
   // --- REACT FLOW HANDLERS ---
   onNodesChange: (changes) => {
-    set((state) => ({
-      nodes: applyNodeChanges(changes, state.nodes),
-    }))
+    set({
+      nodes: applyNodeChanges(changes, get().nodes),
+    })
   },
 
   // --- CUSTOM CHAT ACTIONS ---
@@ -94,9 +94,9 @@ export const useFlowStore = create<FlowState>((set, get) => ({
       },
     }
 
-    set((state) => ({
-      nodes: [...state.nodes, newNode],
-    }))
+    set({
+      nodes: [...get().nodes, newNode],
+    })
 
     return nodeId
   },
@@ -110,7 +110,9 @@ export const useFlowStore = create<FlowState>((set, get) => ({
       target: nodeId,
     }
 
-    const parentNode = get().nodes.find((node) => node.id === parentId)
+    const { nodes, edges } = get()
+
+    const parentNode = nodes.find((node) => node.id === parentId)
     invariant(parentNode, `Parent node not found for ${parentId}`)
 
     const newNode: FlowNode = {
@@ -127,21 +129,19 @@ export const useFlowStore = create<FlowState>((set, get) => ({
       },
     }
 
-    set((state) => {
-      const updatedParentNode: FlowNode = {
-        ...parentNode,
-        data: {
-          ...parentNode.data,
-          childrenIds: [...parentNode.data.childrenIds, nodeId],
-        },
-      }
+    const updatedParentNode: FlowNode = {
+      ...parentNode,
+      data: {
+        ...parentNode.data,
+        childrenIds: [...parentNode.data.childrenIds, nodeId],
+      },
+    }
 
-      return {
-        nodes: state.nodes
-          .map((node) => (node.id === parentId ? updatedParentNode : node))
-          .concat(newNode),
-        edges: addEdge(newEdge, state.edges),
-      }
+    set({
+      nodes: nodes
+        .map((node) => (node.id === parentId ? updatedParentNode : node))
+        .concat(newNode),
+      edges: addEdge(newEdge, edges),
     })
 
     return nodeId

@@ -167,6 +167,9 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
                 color="red"
                 title="Delete node"
                 variant="outline"
+                onClick={() => {
+                  deleteNode(props.id)
+                }}
               >
                 <Icon icon="mingcute:delete-fill" />
               </ActionIcon>
