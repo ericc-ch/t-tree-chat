@@ -268,25 +268,23 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
               </ActionIcon>
             </Group>
 
-            {opened && (
-              <Stack gap="sm" pt="md">
-                {availableSettingsKeys.map((key) => {
-                  const Field = settingsFieldMap.get(
-                    key as keyof AdvancedModelSettings,
-                  )
-                  invariant(Field, `No setting field found for ${key}`)
+            <Stack display={opened ? "flex" : "none"} gap="sm" pt="md">
+              {availableSettingsKeys.map((key) => {
+                const Field = settingsFieldMap.get(
+                  key as keyof AdvancedModelSettings,
+                )
+                invariant(Field, `No setting field found for ${key}`)
 
-                  return (
-                    <Field
-                      key={key}
-                      defaultValue={
-                        props.data.config[key as keyof AdvancedModelSettings]
-                      }
-                    />
-                  )
-                })}
-              </Stack>
-            )}
+                return (
+                  <Field
+                    key={key}
+                    defaultValue={
+                      props.data.config[key as keyof AdvancedModelSettings]
+                    }
+                  />
+                )
+              })}
+            </Stack>
           </Stack>
         </Stack>
       </Paper>
