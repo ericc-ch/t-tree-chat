@@ -1,10 +1,16 @@
 import type { ComponentProps, ComponentType } from "react"
 
 import { Slider, Space, Stack, Switch, Text, Textarea } from "@mantine/core"
+import invariant from "tiny-invariant"
 
-import type { AdvancedConfig } from "~/src/lib/generation"
+import type {
+  AdvancedConfig,
+  GenerationConfig,
+  ModelCapabilities,
+} from "~/src/lib/generation"
 
 import { GENERATION_CONFIG_KEYS } from "~/src/lib/constants"
+import { ALL_MODEL_CAPABILITIES } from "~/src/providers/all"
 
 import classes from "./user-message.module.css"
 
@@ -73,3 +79,32 @@ export const advancedConfigMap = new Map<
   ["temperature", Temperature],
   ["thinkingMode", ThinkingMode],
 ])
+
+interface AdvancedConfigFormProps {
+  opened: boolean
+  model: string
+  config: GenerationConfig
+}
+
+export const AdvancedConfigForm = (props: AdvancedConfigFormProps) => {
+  const capabilities = ALL_MODEL_CAPABILITIES.get(props.model)
+  invariant(
+    capabilities,
+    `Model capabilities not found for model ${props.model}`,
+  )
+
+  const capabilityKeys = Object.entries(capabilities)
+    .filter(([, value]) => value)
+    .map(([key]) => key as keyof ModelCapabilities)
+
+  return (
+    <Stack display={props.opened ? "flex" : "none"} gap="sm" pt="md">
+      {capabilityKeys.map((key: keyof ModelCapabilities) => {
+        const Field = advancedConfigMap.get(key)
+        invariant(Field, `No setting field found for ${key}`)
+
+        return <Field key={key} defaultValue={props.config[key]} />
+      })}
+    </Stack>
+  )
+}

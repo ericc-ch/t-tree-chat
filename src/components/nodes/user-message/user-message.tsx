@@ -23,16 +23,12 @@ import { useState, type FormEvent } from "react"
 import invariant from "tiny-invariant"
 
 import { GENERATION_CONFIG_KEYS } from "~/src/lib/constants"
-import { getConfig, type ModelCapabilities } from "~/src/lib/generation"
+import { getConfig } from "~/src/lib/generation"
 import { buildMessages } from "~/src/lib/utils"
-import {
-  ALL_MODEL_CAPABILITIES,
-  ALL_MODEL_OPTIONS_MAPPER,
-  ALL_MODELS,
-} from "~/src/providers/all"
+import { ALL_MODEL_OPTIONS_MAPPER, ALL_MODELS } from "~/src/providers/all"
 import { useFlowStore, type UserMessageNode } from "~/src/stores/flow"
 
-import { advancedConfigMap } from "./advanced-config"
+import { AdvancedConfigForm } from "./advanced-config"
 import classes from "./user-message.module.css"
 
 export function UserMessageNode(props: NodeProps<UserMessageNode>) {
@@ -53,16 +49,6 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
   const [selectedModel, setSelectedModel] = useState<string>(
     props.data.config.model,
   )
-
-  const capabilities = ALL_MODEL_CAPABILITIES.get(selectedModel)
-  invariant(
-    capabilities,
-    `Model capabilities not found for model ${selectedModel}`,
-  )
-
-  const capabilityKeys = Object.entries(capabilities)
-    .filter(([, value]) => value)
-    .map(([key]) => key as keyof ModelCapabilities)
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -249,14 +235,11 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
               </ActionIcon>
             </Group>
 
-            <Stack display={opened ? "flex" : "none"} gap="sm" pt="md">
-              {capabilityKeys.map((key: keyof ModelCapabilities) => {
-                const Field = advancedConfigMap.get(key)
-                invariant(Field, `No setting field found for ${key}`)
-
-                return <Field key={key} defaultValue={props.data.config[key]} />
-              })}
-            </Stack>
+            <AdvancedConfigForm
+              config={props.data.config}
+              model={selectedModel}
+              opened={opened}
+            />
           </Stack>
         </Stack>
       </Paper>
