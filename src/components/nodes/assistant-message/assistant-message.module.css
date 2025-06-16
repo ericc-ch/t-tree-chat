@@ -1,4 +1,10 @@
-.container {
+.paper {
+  border-color: var(--mantine-color-blue-1);
+}
+
+/* Markdown Renderer */
+
+.markdownRenderer {
   overflow-y: auto;
   max-height: 540px;
 }

@@ -11,3 +11,13 @@ createRoot(root).render(
     <App />
   </StrictMode>,
 )
+
+const save = (event: KeyboardEvent) => {
+  if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+    event.preventDefault()
+
+    console.log("Ctrl+S pressed! Executing custom save logic...")
+  }
+}
+
+document.addEventListener("keydown", save)

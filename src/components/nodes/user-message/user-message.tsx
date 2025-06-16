@@ -79,6 +79,7 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
 
       <Paper
         withBorder
+        className={classes.paper}
         component="form"
         p="md"
         shadow="md"

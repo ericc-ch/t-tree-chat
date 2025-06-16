@@ -11,3 +11,6 @@ export const buildMessages = (
       content: node.data.message,
     }
   })
+
+export const sleep = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms))

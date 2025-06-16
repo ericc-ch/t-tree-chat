@@ -6,3 +6,7 @@
 .moreOptionsButtonActive {
   transform: rotate(180deg);
 }
+
+.paper {
+  border-color: var(--mantine-color-yellow-0);
+}

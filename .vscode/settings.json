@@ -2,7 +2,10 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
   },
-  "cSpell.words": ["echristian"],
+  "cSpell.words": [
+    "echristian",
+    "mantine"
+  ],
   "tailwindCSS.classFunctions": ["clsx", "cn", "cva"],
   "typescript.tsdk": "node_modules/typescript/lib"
 }
