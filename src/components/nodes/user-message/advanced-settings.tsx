@@ -1,16 +1,8 @@
 import type { ComponentType } from "react"
 
-import {
-  NumberInput,
-  Slider,
-  Space,
-  Stack,
-  Switch,
-  Text,
-  Textarea,
-} from "@mantine/core"
+import { Slider, Space, Stack, Switch, Text, Textarea } from "@mantine/core"
 
-import type { AdvancedModelSettings } from "~/src/providers/types"
+import type { AdvancedConfig } from "~/src/lib/generation"
 
 import { GENERATION_CONFIG_KEYS } from "~/src/lib/constants"
 
@@ -66,32 +58,12 @@ const ThinkingMode = ({ defaultValue }: FieldProps<boolean>) => (
   />
 )
 
-const ThinkingBudget = ({ defaultValue }: FieldProps<number>) => (
-  <NumberInput
-    defaultValue={defaultValue}
-    label="Thinking budget"
-    max={24576}
-    min={0}
-    name={GENERATION_CONFIG_KEYS.THINKING_BUDGET}
-  />
-)
-
-const ManualThinkingBudget = ({ defaultValue }: FieldProps<boolean>) => (
-  <Switch
-    defaultChecked={defaultValue}
-    label="Manual thinking budget"
-    name={GENERATION_CONFIG_KEYS.MANUAL_THINKING_BUDGET}
-  />
-)
-
 export const settingsFieldMap = new Map<
-  keyof AdvancedModelSettings,
+  keyof AdvancedConfig,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ComponentType<FieldProps<any>>
 >([
   ["systemPrompt", SystemPrompt],
   ["temperature", Temperature],
   ["thinkingMode", ThinkingMode],
-  ["manualThinkingBudget", ManualThinkingBudget],
-  ["thinkingBudget", ThinkingBudget],
 ])

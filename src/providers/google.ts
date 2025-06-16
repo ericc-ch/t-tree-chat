@@ -8,7 +8,7 @@ import {
 } from "@ai-sdk/google"
 import invariant from "tiny-invariant"
 
-import type { AdvancedModelSettings } from "./types"
+import type { ModelCapabilities } from "../lib/generation"
 
 import { GENERATION_CONFIG_KEYS } from "../lib/constants"
 import { useSettingsStore } from "../stores/settings"
@@ -54,7 +54,7 @@ export const GOOGLE_MODELS: Array<{
 
 export const GOOGLE_MODEL_AVAILABLE_SETTINGS = new Map<
   GoogleModelID,
-  AdvancedModelSettings
+  ModelCapabilities
 >([
   [
     "gemini-2.5-flash-preview-05-20",
@@ -62,8 +62,6 @@ export const GOOGLE_MODEL_AVAILABLE_SETTINGS = new Map<
       systemPrompt: true,
       temperature: true,
       thinkingMode: true,
-      manualThinkingBudget: false,
-      thinkingBudget: false,
     },
   ],
   [
@@ -72,8 +70,6 @@ export const GOOGLE_MODEL_AVAILABLE_SETTINGS = new Map<
       systemPrompt: true,
       temperature: true,
       thinkingMode: false,
-      manualThinkingBudget: false,
-      thinkingBudget: false,
     },
   ],
   [
@@ -82,8 +78,6 @@ export const GOOGLE_MODEL_AVAILABLE_SETTINGS = new Map<
       systemPrompt: true,
       temperature: true,
       thinkingMode: false,
-      manualThinkingBudget: false,
-      thinkingBudget: false,
     },
   ],
 ])
@@ -108,13 +102,6 @@ export const GOOGLE_MODEL_OPTIONS_PARSERS: Map<GoogleModelID, OptionsParser> =
         const thinkingMode = Boolean(
           formData.get(GENERATION_CONFIG_KEYS.THINKING_MODE),
         )
-        // const thinkingBudget = Number.parseInt(
-        //   formData.get(GENERATION_CONFIG_KEYS.THINKING_BUDGET) as string,
-        //   10,
-        // )
-        // const manualThinkingBudget = Boolean(
-        //   formData.get(GENERATION_CONFIG_KEYS.MANUAL_THINKING_BUDGET),
-        // )
 
         return {
           model: getGoogleModel("gemini-2.5-flash-preview-05-20"),
@@ -126,9 +113,6 @@ export const GOOGLE_MODEL_OPTIONS_PARSERS: Map<GoogleModelID, OptionsParser> =
                 // TODO: Implement thinking budget
                 // 0 disables thinking mode btw
                 // https://ai-sdk.dev/providers/ai-sdk-providers/google-generative-ai#language-models
-
-                // includeThoughts: thinkingBudget > 0,
-                // thinkingBudget: manualThinkingBudget ? thinkingBudget : null,
                 includeThoughts: thinkingMode,
                 thinkingBudget: thinkingMode ? null : 0,
               },

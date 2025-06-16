@@ -22,7 +22,7 @@ import clsx from "clsx"
 import { useState } from "react"
 import invariant from "tiny-invariant"
 
-import type { AdvancedModelSettings } from "~/src/providers/types"
+import type { ModelCapabilities } from "~/src/lib/generation"
 
 import { GENERATION_CONFIG_KEYS, MODEL_OPTIONS } from "~/src/lib/constants"
 import { buildMessages } from "~/src/lib/utils"
@@ -54,11 +54,15 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
     props.data.config.model,
   )
 
-  const availableSettings = GOOGLE_MODEL_AVAILABLE_SETTINGS.get(selectedModel)
-  invariant(availableSettings, `Not settings found for model ${selectedModel}`)
-  const availableSettingsKeys = Object.entries(availableSettings)
+  const capabilities = GOOGLE_MODEL_AVAILABLE_SETTINGS.get(selectedModel)
+  invariant(
+    capabilities,
+    `Model capabilities not found for model ${selectedModel}`,
+  )
+
+  const capabilityKeys = Object.entries(capabilities)
     .filter(([, value]) => value)
-    .map(([key]) => key)
+    .map(([key]) => key as keyof ModelCapabilities)
 
   return (
     <>
@@ -264,20 +268,11 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
             </Group>
 
             <Stack display={opened ? "flex" : "none"} gap="sm" pt="md">
-              {availableSettingsKeys.map((key) => {
-                const Field = settingsFieldMap.get(
-                  key as keyof AdvancedModelSettings,
-                )
+              {capabilityKeys.map((key: keyof ModelCapabilities) => {
+                const Field = settingsFieldMap.get(key)
                 invariant(Field, `No setting field found for ${key}`)
 
-                return (
-                  <Field
-                    key={key}
-                    defaultValue={
-                      props.data.config[key as keyof AdvancedModelSettings]
-                    }
-                  />
-                )
+                return <Field key={key} defaultValue={props.data.config[key]} />
               })}
             </Stack>
           </Stack>

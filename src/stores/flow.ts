@@ -11,16 +11,10 @@ import invariant from "tiny-invariant"
 import { create } from "zustand"
 
 import { NODE_ORIGIN } from "../lib/constants"
-import { GOOGLE_MODELS } from "../providers/google"
-
-export interface GenerationConfig {
-  model: string
-  systemPrompt: string
-  temperature: number
-  thinkingMode: boolean
-  manualThinkingBudget: boolean
-  thinkingBudget: number
-}
+import {
+  DEFAULT_GENERATION_CONFIG,
+  type GenerationConfig,
+} from "../lib/generation"
 
 interface MessageNodeData extends Record<string, unknown> {
   config: GenerationConfig
@@ -86,14 +80,7 @@ export const useFlowStore = create<FlowState>((set, get) => ({
         message: "",
         parentId: undefined,
         childrenIds: [],
-        config: {
-          model: GOOGLE_MODELS[0].value,
-          systemPrompt: "",
-          temperature: 0.5,
-          thinkingMode: false,
-          manualThinkingBudget: false,
-          thinkingBudget: 0,
-        },
+        config: structuredClone(DEFAULT_GENERATION_CONFIG),
       },
     }
 
@@ -144,7 +131,7 @@ export const useFlowStore = create<FlowState>((set, get) => ({
         message: "",
         parentId,
         childrenIds: [],
-        config: parentNode.data.config,
+        config: structuredClone(parentNode.data.config),
       },
     }
 
