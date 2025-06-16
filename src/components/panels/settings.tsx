@@ -1,62 +1,113 @@
-import { Button, Group, Input, Paper, Stack } from "@mantine/core"
+import { Icon } from "@iconify/react/dist/iconify.js"
+import {
+  ActionIcon,
+  Button,
+  Divider,
+  Group,
+  Paper,
+  PasswordInput,
+  Stack,
+  Title,
+} from "@mantine/core"
 import { Panel } from "@xyflow/react"
 import { useState } from "react"
 
 import { useSettingsStore } from "~/src/stores/settings"
+import { useUIStore } from "~/src/stores/ui"
+
+import classes from "./settings.module.css"
 
 // eslint-disable-next-line max-lines-per-function
 export function Settings() {
   const [isOpen, setIsOpen] = useState(false)
   const setAPIKeys = useSettingsStore((store) => store.setAPIKeys)
+  const closeContextMenu = useUIStore((store) => store.closeContextMenu)
 
   if (!isOpen) {
     return (
-      <Panel position="center-left">
-        <Button
+      <Panel position="top-left">
+        <ActionIcon
+          aria-label="Open settings"
+          className={classes.toggleSettings}
+          size="lg"
+          title="Open settings"
+          variant="outline"
           onClick={() => {
             setIsOpen(true)
+            closeContextMenu()
           }}
         >
-          Settings
-        </Button>
+          <Icon icon="mingcute:align-arrow-right-fill" />
+        </ActionIcon>
       </Panel>
     )
   }
 
   return (
     <Panel position="center-left">
-      <Paper withBorder h="16rem" p="sm">
-        <Stack
-          component="form"
-          h="100%"
-          onSubmit={(e) => {
-            e.preventDefault()
-
-            const data = new FormData(
-              e.currentTarget as unknown as HTMLFormElement,
-            )
-            const openRouterAPIKey = data.get("openrouter") as string
-            const googleAPIKey = data.get("google") as string
-
-            console.log(openRouterAPIKey, googleAPIKey)
-
-            setAPIKeys({ openRouterAPIKey, googleAPIKey })
-          }}
-        >
-          <Input name="openrouter" placeholder="OpenRouter API Key" />
-          <Input name="google" placeholder="Gemini API Key" />
-
-          <Group mt="auto">
-            <Button type="submit">Save</Button>
-            <Button
-              variant="default"
+      <Paper withBorder h="calc(100vh - 2rem)" p="sm" shadow="lg" w="16rem">
+        <Stack gap={0}>
+          <Group justify="end">
+            <ActionIcon
+              aria-label="Close settings"
+              title="Close settings"
+              variant="outline"
               onClick={() => {
                 setIsOpen(false)
               }}
             >
-              Close
-            </Button>
+              <Icon icon="mingcute:close-fill" />
+            </ActionIcon>
           </Group>
+
+          <Stack
+            component="form"
+            gap="md"
+            onSubmit={(e) => {
+              e.preventDefault()
+
+              const data = new FormData(
+                e.currentTarget as unknown as HTMLFormElement,
+              )
+              const openRouterAPIKey = data.get("openrouter") as string
+              const googleAPIKey = data.get("google") as string
+
+              console.log(openRouterAPIKey, googleAPIKey)
+
+              setAPIKeys({ openRouterAPIKey, googleAPIKey })
+            }}
+          >
+            <Title order={3}>API Keys</Title>
+
+            <Stack gap="xs">
+              <PasswordInput
+                label="OpenRouter API Key"
+                name="openrouter"
+                placeholder="sk-or-..."
+              />
+              <PasswordInput
+                label="Gemini API Key"
+                name="google"
+                placeholder="AIzaSy..."
+              />
+            </Stack>
+
+            <Group justify="end">
+              <Button
+                leftSection={<Icon icon="mingcute:save-2-fill" />}
+                mt="sm"
+                type="submit"
+              >
+                Save
+              </Button>
+            </Group>
+          </Stack>
+
+          <Divider my="xl" />
+
+          <Stack gap="md">
+            <Title order={3}>Account</Title>
+          </Stack>
         </Stack>
       </Paper>
     </Panel>
