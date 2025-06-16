@@ -11,6 +11,7 @@ import {
   Text,
   Title,
 } from "@mantine/core"
+import { notifications } from "@mantine/notifications"
 import { Panel } from "@xyflow/react"
 import { useState } from "react"
 
@@ -75,6 +76,12 @@ export function Settings() {
               const googleAPIKey = data.get("google") as string
 
               setAPIKeys({ openRouterAPIKey, googleAPIKey })
+
+              notifications.show({
+                withBorder: true,
+                message: "API keys saved!",
+                color: "green",
+              })
             }}
           >
             <Title order={3}>API Keys</Title>
@@ -95,7 +102,6 @@ export function Settings() {
             <Group justify="end">
               <Button
                 leftSection={<Icon icon="mingcute:save-2-fill" />}
-                mt="sm"
                 type="submit"
               >
                 Save

@@ -25,6 +25,7 @@ import invariant from "tiny-invariant"
 import type { AdvancedModelSettings } from "~/src/providers/types"
 
 import { GENERATION_CONFIG_KEYS, MODEL_OPTIONS } from "~/src/lib/constants"
+import { buildMessages } from "~/src/lib/utils"
 import {
   GOOGLE_MODEL_AVAILABLE_SETTINGS,
   GOOGLE_MODEL_OPTIONS_PARSERS,
@@ -42,6 +43,7 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
   const createAssistantNode = useFlowStore((state) => state.createAssistantNode)
   const deleteNode = useFlowStore((state) => state.deleteNode)
   const updateNode = useFlowStore((state) => state.updateNode)
+  const getAncestors = useFlowStore((state) => state.getAncestors)
 
   // Child node means it's not a root node
   const isChildNode = Boolean(props.data.parentId)
@@ -101,18 +103,10 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
             formData.get(GENERATION_CONFIG_KEYS.MANUAL_THINKING_BUDGET),
           )
           const thinkingBudget = Number.parseInt(
-            formData.get(GENERATION_CONFIG_KEYS.THINKING_BUDGET) as string,
+            (formData.get(GENERATION_CONFIG_KEYS.THINKING_BUDGET)
+              ?? "0") as string,
             10,
           )
-
-          console.log({
-            model,
-            systemPrompt,
-            temperature,
-            thinkingMode,
-            manualThinkingBudget,
-            thinkingBudget,
-          })
 
           updateNode({
             nodeId: props.id,
@@ -137,46 +131,48 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
           // https://reactflow.dev/learn/troubleshooting#couldnt-create-edge-for-sourcetarget-handle-id-some-id-edge-id-some-id
           updateNodeInternals(props.id)
 
-          if (props.parentId) {
-            // Stub
-          } else {
-            // This means this is a root node
-            const messages: Array<CoreMessage> = [
-              {
-                role: "user",
-                content: formData.get(GENERATION_CONFIG_KEYS.MESSAGE) as string,
-              },
-            ]
-            const parser = GOOGLE_MODEL_OPTIONS_PARSERS.get(model)
-            invariant(parser, `No options parser found for model ${model}`)
+          let messages: Array<CoreMessage> = []
 
-            const options = parser(event)
+          if (props.data.parentId) {
+            // If it has a parent, we build the chat history first
+            const ancestors = getAncestors(props.data.parentId)
+            messages = buildMessages(ancestors)
+          }
 
-            const response = streamText({
-              ...options,
-              messages,
-            })
+          messages.push({
+            role: "user",
+            content: message,
+          })
 
-            for await (const part of response.fullStream) {
-              switch (part.type) {
-                case "text-delta": {
-                  updateNode({
-                    nodeId: childId,
-                    updater: (data) => ({
-                      ...data,
-                      message: data.message + part.textDelta,
-                    }),
-                  })
-                  break
-                }
-                case "reasoning": {
-                  console.log(part.textDelta)
-                  break
-                }
-                default: {
-                  console.log(part)
-                  break
-                }
+          const parser = GOOGLE_MODEL_OPTIONS_PARSERS.get(model)
+          invariant(parser, `No options parser found for model ${model}`)
+
+          const options = parser(event)
+
+          const response = streamText({
+            ...options,
+            messages,
+          })
+
+          for await (const part of response.fullStream) {
+            switch (part.type) {
+              case "text-delta": {
+                updateNode({
+                  nodeId: childId,
+                  updater: (data) => ({
+                    ...data,
+                    message: data.message + part.textDelta,
+                  }),
+                })
+                break
+              }
+              case "reasoning": {
+                // console.log(part.textDelta)
+                break
+              }
+              default: {
+                // console.log(part)
+                break
               }
             }
           }
@@ -236,6 +232,7 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
               <ActionIcon
                 aria-label="Delete node"
                 color="red"
+                mr="auto"
                 title="Delete node"
                 variant="outline"
                 onClick={() => {
@@ -244,9 +241,9 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
               >
                 <Icon icon="mingcute:delete-fill" />
               </ActionIcon>
+
               <ActionIcon
                 aria-label="Duplicate node"
-                ml="auto"
                 title="Duplicate node"
                 variant="outline"
               >

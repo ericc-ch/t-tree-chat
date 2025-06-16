@@ -1,4 +1,5 @@
 import { MantineProvider } from "@mantine/core"
+import { Notifications } from "@mantine/notifications"
 import {
   Background,
   BackgroundVariant,
@@ -19,6 +20,7 @@ import { useFlowStore, type FlowNode } from "./stores/flow"
 
 // Mantine
 import "@mantine/core/styles.layer.css"
+import "@mantine/notifications/styles.layer.css"
 // import "@mantine/code-highlight/styles.layer.css"
 // React Flow
 import "@xyflow/react/dist/style.css"
@@ -78,6 +80,7 @@ export function App() {
     <ReactFlowProvider>
       <MantineProvider>
         <Main />
+        <Notifications position="bottom-center" />
       </MantineProvider>
     </ReactFlowProvider>
   )
