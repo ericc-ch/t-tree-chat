@@ -14,7 +14,7 @@ import {
 import { ContextMenu, menuClickListener } from "./components/context-menu"
 import { AssistantMessageNode } from "./components/nodes/assistant-message/assistant-message"
 import { UserMessageNode } from "./components/nodes/user-message/user-message"
-import { Settings } from "./components/panels/settings"
+import { Sidebar } from "./components/panels/sidebar/sidebar"
 import { NODE_ORIGIN } from "./lib/constants"
 import { useFlowStore, type FlowNode } from "./stores/flow"
 
@@ -67,7 +67,7 @@ function Main() {
           <MiniMap />
 
           {/* Custom Components */}
-          <Settings />
+          <Sidebar />
         </ReactFlow>
       </div>
 

@@ -58,7 +58,7 @@ const ThinkingMode = ({ defaultValue }: FieldProps<boolean>) => (
   />
 )
 
-export const settingsFieldMap = new Map<
+export const advancedConfigMap = new Map<
   keyof AdvancedConfig,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ComponentType<FieldProps<any>>

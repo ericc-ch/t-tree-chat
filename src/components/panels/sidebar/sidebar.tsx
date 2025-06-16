@@ -17,9 +17,9 @@ import { useState } from "react"
 
 import { useSettingsStore } from "~/src/stores/settings"
 
-import classes from "./settings.module.css"
+import classes from "./sidebar.module.css"
 
-export function Settings() {
+export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false)
   const setAPIKeys = useSettingsStore((store) => store.setAPIKeys)
 
@@ -27,10 +27,10 @@ export function Settings() {
     return (
       <Panel position="top-left">
         <ActionIcon
-          aria-label="Open settings"
-          className={classes.toggleSettings}
+          aria-label="Open sidebar"
+          className={classes.toggleSidebar}
           size="lg"
-          title="Open settings"
+          title="Open sidebar"
           variant="outline"
           onClick={() => {
             setIsOpen(true)
@@ -48,8 +48,8 @@ export function Settings() {
         <Stack gap={0}>
           <Group justify="end">
             <ActionIcon
-              aria-label="Close settings"
-              title="Close settings"
+              aria-label="Close sidebar"
+              title="Close sidebar"
               variant="outline"
               onClick={() => {
                 setIsOpen(false)

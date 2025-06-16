@@ -1,6 +1,3 @@
-import type { streamText } from "ai"
-import type { FormEvent } from "react"
-
 import {
   createGoogleGenerativeAI,
   type GoogleGenerativeAIProvider,
@@ -9,8 +6,8 @@ import {
 import invariant from "tiny-invariant"
 
 import type { ModelCapabilities } from "../lib/generation"
+import type { OptionsMapper } from "./types"
 
-import { GENERATION_CONFIG_KEYS } from "../lib/constants"
 import { useSettingsStore } from "../stores/settings"
 
 const getGoogleProvider = () => {
@@ -31,7 +28,16 @@ export const getGoogleModel = (
   settings?: GoogleModelSettings,
 ) => {
   const provider = getGoogleProvider()
-  return provider(model, settings)
+  return provider(model, {
+    safetySettings: [
+      { category: "HARM_CATEGORY_CIVIC_INTEGRITY", threshold: "BLOCK_NONE" },
+      { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+      { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+      { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+      { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+    ],
+    ...settings,
+  })
 }
 
 export const GOOGLE_MODELS: Array<{
@@ -52,7 +58,7 @@ export const GOOGLE_MODELS: Array<{
   },
 ]
 
-export const GOOGLE_MODEL_AVAILABLE_SETTINGS = new Map<
+export const GOOGLE_MODEL_CAPABILITIES = new Map<
   GoogleModelID,
   ModelCapabilities
 >([
@@ -82,42 +88,46 @@ export const GOOGLE_MODEL_AVAILABLE_SETTINGS = new Map<
   ],
 ])
 
-type StreamTextOptions = Parameters<typeof streamText>[0]
-type OptionsParser = (event: FormEvent<HTMLFormElement>) => StreamTextOptions
-
-export const GOOGLE_MODEL_OPTIONS_PARSERS: Map<GoogleModelID, OptionsParser> =
+export const GOOGLE_MODEL_OPTIONS_MAPPER: Map<GoogleModelID, OptionsMapper> =
   new Map([
     [
       "gemini-2.5-flash-preview-05-20",
-      (event): StreamTextOptions => {
-        const formData = new FormData(event.currentTarget)
-
-        const temperatureString = formData.get(
-          GENERATION_CONFIG_KEYS.TEMPERATURE,
-        ) as string
-        const temperature = Number.parseFloat(temperatureString)
-        const system = formData.get(
-          GENERATION_CONFIG_KEYS.SYSTEM_PROMPT,
-        ) as string
-        const thinkingMode = Boolean(
-          formData.get(GENERATION_CONFIG_KEYS.THINKING_MODE),
-        )
-
+      (config) => {
         return {
           model: getGoogleModel("gemini-2.5-flash-preview-05-20"),
-          system,
-          temperature,
+          system: config.systemPrompt,
+          temperature: config.temperature,
           providerOptions: {
             google: {
               thinkingConfig: {
                 // TODO: Implement thinking budget
                 // 0 disables thinking mode btw
                 // https://ai-sdk.dev/providers/ai-sdk-providers/google-generative-ai#language-models
-                includeThoughts: thinkingMode,
-                thinkingBudget: thinkingMode ? null : 0,
+                includeThoughts: config.thinkingMode,
+                thinkingBudget: config.thinkingMode ? null : 0,
               },
             } satisfies GoogleGenerativeAIProviderOptions,
           },
+        }
+      },
+    ],
+    [
+      "gemini-2.0-flash",
+      (config) => {
+        return {
+          model: getGoogleModel("gemini-2.0-flash"),
+          system: config.systemPrompt,
+          temperature: config.temperature,
+        }
+      },
+    ],
+    [
+      "gemini-2.0-flash-lite",
+      (config) => {
+        return {
+          model: getGoogleModel("gemini-2.0-flash-lite"),
+          system: config.systemPrompt,
+          temperature: config.temperature,
         }
       },
     ],

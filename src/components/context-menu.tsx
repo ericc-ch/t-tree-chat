@@ -49,11 +49,6 @@ export function ContextMenu() {
         >
           New Chat
         </Menu.Item>
-        <Menu.Item
-          leftSection={<Icon fontSize={14} icon="mingcute:key-2-fill" />}
-        >
-          Set API keys
-        </Menu.Item>
       </Menu.Dropdown>
     </Menu>
   )

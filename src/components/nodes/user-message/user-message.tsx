@@ -22,17 +22,17 @@ import clsx from "clsx"
 import { useState } from "react"
 import invariant from "tiny-invariant"
 
-import type { ModelCapabilities } from "~/src/lib/generation"
-
-import { GENERATION_CONFIG_KEYS, MODEL_OPTIONS } from "~/src/lib/constants"
+import { GENERATION_CONFIG_KEYS } from "~/src/lib/constants"
+import { getConfig, type ModelCapabilities } from "~/src/lib/generation"
 import { buildMessages } from "~/src/lib/utils"
 import {
-  GOOGLE_MODEL_AVAILABLE_SETTINGS,
-  GOOGLE_MODEL_OPTIONS_PARSERS,
-} from "~/src/providers/google"
+  ALL_MODEL_CAPABILITIES,
+  ALL_MODEL_OPTIONS_MAPPER,
+  ALL_MODELS,
+} from "~/src/providers/all"
 import { useFlowStore, type UserMessageNode } from "~/src/stores/flow"
 
-import { settingsFieldMap } from "./advanced-settings"
+import { advancedConfigMap } from "./advanced-config"
 import classes from "./user-message.module.css"
 
 export function UserMessageNode(props: NodeProps<UserMessageNode>) {
@@ -54,7 +54,7 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
     props.data.config.model,
   )
 
-  const capabilities = GOOGLE_MODEL_AVAILABLE_SETTINGS.get(selectedModel)
+  const capabilities = ALL_MODEL_CAPABILITIES.get(selectedModel)
   invariant(
     capabilities,
     `Model capabilities not found for model ${selectedModel}`,
@@ -91,24 +91,9 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
           )
 
           const message = formData.get(GENERATION_CONFIG_KEYS.MESSAGE) as string
+          const model = formData.get(GENERATION_CONFIG_KEYS.MODEL) as string
 
-          const model = formData.get("model") as string
-          const systemPrompt = formData.get(
-            GENERATION_CONFIG_KEYS.SYSTEM_PROMPT,
-          ) as string
-          const temperature = Number.parseFloat(
-            formData.get(GENERATION_CONFIG_KEYS.TEMPERATURE) as string,
-          )
-          const thinkingMode =
-            formData.get(GENERATION_CONFIG_KEYS.THINKING_MODE) === "on"
-          const manualThinkingBudget = Boolean(
-            formData.get(GENERATION_CONFIG_KEYS.MANUAL_THINKING_BUDGET),
-          )
-          const thinkingBudget = Number.parseInt(
-            (formData.get(GENERATION_CONFIG_KEYS.THINKING_BUDGET)
-              ?? "0") as string,
-            10,
-          )
+          const config = getConfig(formData)
 
           updateNode({
             nodeId: props.id,
@@ -117,11 +102,7 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
               message,
               config: {
                 model,
-                systemPrompt,
-                temperature,
-                thinkingMode,
-                manualThinkingBudget,
-                thinkingBudget,
+                ...config,
               },
             }),
           })
@@ -146,10 +127,10 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
             content: message,
           })
 
-          const parser = GOOGLE_MODEL_OPTIONS_PARSERS.get(model)
-          invariant(parser, `No options parser found for model ${model}`)
+          const mapper = ALL_MODEL_OPTIONS_MAPPER.get(model)
+          invariant(mapper, `No options parser found for model ${model}`)
 
-          const options = parser(event)
+          const options = mapper(config)
 
           const response = streamText({
             ...options,
@@ -206,7 +187,7 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
             >
               <Select
                 allowDeselect={false}
-                data={MODEL_OPTIONS}
+                data={ALL_MODELS}
                 name={GENERATION_CONFIG_KEYS.MODEL}
                 placeholder="Pick a model"
                 value={selectedModel}
@@ -269,7 +250,7 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
 
             <Stack display={opened ? "flex" : "none"} gap="sm" pt="md">
               {capabilityKeys.map((key: keyof ModelCapabilities) => {
-                const Field = settingsFieldMap.get(key)
+                const Field = advancedConfigMap.get(key)
                 invariant(Field, `No setting field found for ${key}`)
 
                 return <Field key={key} defaultValue={props.data.config[key]} />
