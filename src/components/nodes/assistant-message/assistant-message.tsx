@@ -24,7 +24,6 @@ import { useFlowStore, type AssistantMessageNode } from "~/src/stores/flow"
 
 import classes from "./assistant-message.module.css"
 
-// eslint-disable-next-line max-lines-per-function
 export function AssistantMessageNode(props: NodeProps<AssistantMessageNode>) {
   const hasChild = props.data.childrenIds.length > 0
 

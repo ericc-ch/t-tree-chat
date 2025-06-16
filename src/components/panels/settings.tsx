@@ -19,7 +19,6 @@ import { useSettingsStore } from "~/src/stores/settings"
 
 import classes from "./settings.module.css"
 
-// eslint-disable-next-line max-lines-per-function
 export function Settings() {
   const [isOpen, setIsOpen] = useState(false)
   const setAPIKeys = useSettingsStore((store) => store.setAPIKeys)

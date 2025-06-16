@@ -35,7 +35,6 @@ import { useFlowStore, type UserMessageNode } from "~/src/stores/flow"
 import { settingsFieldMap } from "./advanced-settings"
 import classes from "./user-message.module.css"
 
-// eslint-disable-next-line max-lines-per-function
 export function UserMessageNode(props: NodeProps<UserMessageNode>) {
   const updateNodeInternals = useUpdateNodeInternals()
 
@@ -80,7 +79,6 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
         p="md"
         shadow="md"
         w="min(calc(100vw - 2rem), 24rem)"
-        // eslint-disable-next-line max-lines-per-function
         onSubmit={async (event) => {
           event.preventDefault()
 

@@ -1,17 +1,24 @@
 import config from "@echristian/eslint-config"
 
-export default config({
-  jsx: {
-    enabled: true,
-    a11y: true,
+export default config(
+  {
+    jsx: {
+      enabled: true,
+      a11y: true,
+    },
+    react: {
+      enabled: true,
+    },
+    reactHooks: {
+      enabled: true,
+    },
+    prettier: {
+      plugins: ["prettier-plugin-packagejson"],
+    },
   },
-  react: {
-    enabled: true,
+  {
+    rules: {
+      "max-lines-per-function": "off",
+    },
   },
-  reactHooks: {
-    enabled: true,
-  },
-  prettier: {
-    plugins: ["prettier-plugin-packagejson"],
-  },
-})
+)

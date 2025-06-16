@@ -64,7 +64,6 @@ interface FlowState {
   }) => string
 }
 
-// eslint-disable-next-line max-lines-per-function
 export const useFlowStore = create<FlowState>((set, get) => ({
   nodes: [],
   edges: [],
