@@ -3,6 +3,7 @@ import {
   Background,
   BackgroundVariant,
   Controls,
+  MiniMap,
   ReactFlow,
   ReactFlowProvider,
   SelectionMode,
@@ -60,6 +61,9 @@ function Main() {
         >
           <Background gap={32} variant={BackgroundVariant.Cross} />
           <Controls />
+          <MiniMap />
+
+          {/* Custom Components */}
           <Settings />
         </ReactFlow>
       </div>

@@ -1,6 +1,7 @@
 import { Icon } from "@iconify/react"
 import {
   ActionIcon,
+  Badge,
   Box,
   Divider,
   Group,
@@ -85,8 +86,6 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
             event.currentTarget as unknown as HTMLFormElement,
           )
 
-          console.log(formData)
-
           const message = formData.get(GENERATION_CONFIG_KEYS.MESSAGE) as string
 
           const model = formData.get("model") as string
@@ -105,6 +104,15 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
             formData.get(GENERATION_CONFIG_KEYS.THINKING_BUDGET) as string,
             10,
           )
+
+          console.log({
+            model,
+            systemPrompt,
+            temperature,
+            thinkingMode,
+            manualThinkingBudget,
+            thinkingBudget,
+          })
 
           updateNode({
             nodeId: props.id,
@@ -144,64 +152,82 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
 
             const options = parser(event)
 
-            const { textStream } = streamText({
-              messages,
+            const response = streamText({
               ...options,
+              messages,
             })
 
-            for await (const textPart of textStream) {
-              console.log(textPart)
-              updateNode({
-                nodeId: childId,
-                updater: (data) => ({
-                  ...data,
-                  message: data.message + textPart,
-                }),
-              })
+            for await (const part of response.fullStream) {
+              switch (part.type) {
+                case "text-delta": {
+                  updateNode({
+                    nodeId: childId,
+                    updater: (data) => ({
+                      ...data,
+                      message: data.message + part.textDelta,
+                    }),
+                  })
+                  break
+                }
+                case "reasoning": {
+                  console.log(part.textDelta)
+                  break
+                }
+                default: {
+                  console.log(part)
+                  break
+                }
+              }
             }
           }
         }}
       >
         <Stack gap="sm">
-          <Textarea
-            autosize
-            defaultValue={props.data.message}
-            label="User prompt"
-            maxRows={6}
-            minRows={4}
-            name={GENERATION_CONFIG_KEYS.MESSAGE}
-            placeholder="Type your prompt here..."
-          />
+          <Badge color="yellow">User</Badge>
 
-          <Box
-            display="grid"
-            style={{
-              gridTemplateColumns: "1fr auto",
-              alignItems: "center",
-              gap: "var(--mantine-spacing-xs)",
-            }}
-          >
-            <Select
-              allowDeselect={false}
-              data={MODEL_OPTIONS}
-              name={GENERATION_CONFIG_KEYS.MODEL}
-              placeholder="Pick a model"
-              value={selectedModel}
-              onChange={(value) => {
-                invariant(value, "Model should not be null")
-                setSelectedModel(value)
-              }}
+          <Divider />
+
+          <Stack gap="sm">
+            <Textarea
+              autosize
+              defaultValue={props.data.message}
+              label="User prompt"
+              maxRows={6}
+              minRows={4}
+              name={GENERATION_CONFIG_KEYS.MESSAGE}
+              placeholder="Type your prompt here..."
             />
 
-            <ActionIcon
-              aria-label="Generate response"
-              size="input-sm"
-              title="Generate response"
-              type="submit"
+            <Box
+              display="grid"
+              style={{
+                gridTemplateColumns: "1fr auto",
+                alignItems: "center",
+                gap: "var(--mantine-spacing-xs)",
+              }}
             >
-              <Icon icon="mingcute:ai-fill" />
-            </ActionIcon>
-          </Box>
+              <Select
+                allowDeselect={false}
+                data={MODEL_OPTIONS}
+                name={GENERATION_CONFIG_KEYS.MODEL}
+                placeholder="Pick a model"
+                value={selectedModel}
+                onChange={(value) => {
+                  invariant(value, "Model should not be null")
+                  setSelectedModel(value)
+                }}
+              />
+
+              <ActionIcon
+                aria-label="Generate response"
+                size="input-sm"
+                title="Generate response"
+                type="submit"
+              >
+                <Icon icon="mingcute:ai-fill" />
+              </ActionIcon>
+            </Box>
+          </Stack>
 
           <Divider />
 

@@ -61,6 +61,7 @@ const ThinkingMode = ({ defaultValue }: FieldProps<boolean>) => (
     label="Thinking mode"
     labelPosition="left"
     name={GENERATION_CONFIG_KEYS.THINKING_MODE}
+    styles={{ body: { justifyContent: "space-between" } }}
     value="on"
   />
 )

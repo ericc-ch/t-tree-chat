@@ -1,12 +1,14 @@
 import { Icon } from "@iconify/react/dist/iconify.js"
 import {
   ActionIcon,
+  Box,
   Button,
   Divider,
   Group,
   Paper,
   PasswordInput,
   Stack,
+  Text,
   Title,
 } from "@mantine/core"
 import { Panel } from "@xyflow/react"
@@ -72,8 +74,6 @@ export function Settings() {
               const openRouterAPIKey = data.get("openrouter") as string
               const googleAPIKey = data.get("google") as string
 
-              console.log(openRouterAPIKey, googleAPIKey)
-
               setAPIKeys({ openRouterAPIKey, googleAPIKey })
             }}
           >
@@ -106,7 +106,31 @@ export function Settings() {
           <Divider my="xl" />
 
           <Stack gap="md">
-            <Title order={3}>Account</Title>
+            <Box>
+              <Title order={3}>Account</Title>
+              <Text c="dimmed" size="sm">
+                For syncing and stuff
+                <br />
+                (currently just syncing)
+              </Text>
+            </Box>
+
+            <Stack gap="xs">
+              <Button
+                leftSection={<Icon icon="mingcute:google-fill" />}
+                type="submit"
+                variant="outline"
+              >
+                Sign in with Google
+              </Button>
+              <Button
+                leftSection={<Icon icon="mingcute:github-fill" />}
+                type="submit"
+                variant="outline"
+              >
+                Sign in with GitHub
+              </Button>
+            </Stack>
           </Stack>
         </Stack>
       </Paper>
