@@ -11,7 +11,11 @@ import {
   useReactFlow,
 } from "@xyflow/react"
 
-import { ContextMenu, menuClickListener } from "./components/context-menu"
+import classes from "./app.module.css"
+import {
+  ContextMenu,
+  menuClickListener,
+} from "./components/context-menu/context-menu"
 import { AssistantMessageNode } from "./components/nodes/assistant-message/assistant-message"
 import { UserMessageNode } from "./components/nodes/user-message/user-message"
 import { Sidebar } from "./components/panels/sidebar/sidebar"
@@ -46,7 +50,7 @@ function Main() {
 
   return (
     <main>
-      <div style={{ width: "100v", height: "100vh" }}>
+      <div className={classes.flowContainer}>
         <ReactFlow
           zoomOnDoubleClick
           edges={edges}

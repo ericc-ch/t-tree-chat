@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react"
 
-import { Box, Table, TypographyStylesProvider } from "@mantine/core"
+import { Table, TypographyStylesProvider } from "@mantine/core"
 import clsx from "clsx"
 import Markdown from "markdown-to-jsx"
 
@@ -28,11 +28,11 @@ interface MarkdownRendererProps {
 
 export function MarkdownRenderer(props: MarkdownRendererProps) {
   return (
-    <Box className={clsx("nowheel", classes.markdownRenderer)}>
+    <div className={clsx("nowheel", classes.markdownRenderer)}>
       {/* https://reactflow.dev/api-reference/react-flow#nowheelclassname */}
       <TypographyStylesProvider>
         <Markdown options={markdownOptions}>{props.markdown}</Markdown>
       </TypographyStylesProvider>
-    </Box>
+    </div>
   )
 }

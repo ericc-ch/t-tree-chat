@@ -21,7 +21,7 @@ export function CopyButton(props: CopyButtonProps) {
     } catch (error) {
       console.error(error)
       notifications.show({
-        message: "Failed to copy message",
+        message: (error as Error).message,
         color: "red",
       })
     }

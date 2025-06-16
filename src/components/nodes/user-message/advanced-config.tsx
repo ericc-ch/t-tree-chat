@@ -1,4 +1,4 @@
-import type { ComponentType } from "react"
+import type { ComponentProps, ComponentType } from "react"
 
 import { Slider, Space, Stack, Switch, Text, Textarea } from "@mantine/core"
 
@@ -6,8 +6,14 @@ import type { AdvancedConfig } from "~/src/lib/generation"
 
 import { GENERATION_CONFIG_KEYS } from "~/src/lib/constants"
 
+import classes from "./user-message.module.css"
+
 interface FieldProps<T> {
   defaultValue: T
+}
+
+const switchClassnames: ComponentProps<typeof Switch>["classNames"] = {
+  body: classes.switchBody,
 }
 
 const SystemPrompt = ({ defaultValue }: FieldProps<string>) => (
@@ -49,11 +55,11 @@ const Temperature = ({ defaultValue }: FieldProps<number>) => (
 
 const ThinkingMode = ({ defaultValue }: FieldProps<boolean>) => (
   <Switch
+    classNames={switchClassnames}
     defaultChecked={defaultValue}
     label="Thinking mode"
     labelPosition="left"
     name={GENERATION_CONFIG_KEYS.THINKING_MODE}
-    styles={{ body: { justifyContent: "space-between" } }}
     value="on"
   />
 )

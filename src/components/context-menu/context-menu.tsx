@@ -3,12 +3,14 @@ import type React from "react"
 
 import { Icon } from "@iconify/react"
 import { Menu } from "@mantine/core"
+import clsx from "clsx"
 import invariant from "tiny-invariant"
 
-import { MENU_TARGET } from "../lib/constants"
-import { getMenuTarget } from "../lib/dom"
-import { useFlowStore } from "../stores/flow"
-import { useUIStore } from "../stores/ui"
+import { MENU_TARGET } from "../../lib/constants"
+import { getMenuTarget } from "../../lib/dom"
+import { useFlowStore } from "../../stores/flow"
+import { useUIStore } from "../../stores/ui"
+import classes from "./context-menu.module.css"
 
 export function ContextMenu() {
   const opened = useUIStore((state) => state.isContextMenuOpen)
@@ -26,11 +28,8 @@ export function ContextMenu() {
     >
       <Menu.Target>
         <div
-          className={MENU_TARGET}
+          className={clsx(MENU_TARGET, classes.target)}
           data-position="0,0"
-          style={{
-            position: "fixed",
-          }}
         ></div>
       </Menu.Target>
 

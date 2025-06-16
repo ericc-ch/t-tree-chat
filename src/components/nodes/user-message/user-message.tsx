@@ -2,7 +2,6 @@ import { Icon } from "@iconify/react"
 import {
   ActionIcon,
   Badge,
-  Box,
   Divider,
   Group,
   Paper,
@@ -11,6 +10,7 @@ import {
   Textarea,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
+import { notifications } from "@mantine/notifications"
 import {
   Handle,
   Position,
@@ -19,7 +19,7 @@ import {
 } from "@xyflow/react"
 import { streamText, type CoreMessage } from "ai"
 import clsx from "clsx"
-import { useState } from "react"
+import { useState, type FormEvent } from "react"
 import invariant from "tiny-invariant"
 
 import { GENERATION_CONFIG_KEYS } from "~/src/lib/constants"
@@ -64,6 +64,89 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
     .filter(([, value]) => value)
     .map(([key]) => key as keyof ModelCapabilities)
 
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    const formData = new FormData(event.currentTarget)
+
+    const message = formData.get(GENERATION_CONFIG_KEYS.MESSAGE) as string
+    const model = formData.get(GENERATION_CONFIG_KEYS.MODEL) as string
+
+    const config = getConfig(formData)
+
+    updateNode({
+      nodeId: props.id,
+      updater: (data) => ({
+        ...data,
+        message,
+        config: {
+          model,
+          ...config,
+        },
+      }),
+    })
+
+    const childId = createAssistantNode({ parentId: props.id })
+
+    // Call this to notify that we updated the state of the handler
+    // because bottom handler only appears after we added a child
+    // https://reactflow.dev/learn/troubleshooting#couldnt-create-edge-for-sourcetarget-handle-id-some-id-edge-id-some-id
+    updateNodeInternals(props.id)
+
+    let messages: Array<CoreMessage> = []
+
+    if (props.data.parentId) {
+      // If it has a parent, we build the chat history first
+      const ancestors = getAncestors(props.data.parentId)
+      messages = buildMessages(ancestors)
+    }
+
+    messages.push({
+      role: "user",
+      content: message,
+    })
+
+    const mapper = ALL_MODEL_OPTIONS_MAPPER.get(model)
+    invariant(mapper, `No options parser found for model ${model}`)
+
+    try {
+      const options = mapper(config)
+      const response = streamText({
+        ...options,
+        messages,
+      })
+
+      for await (const part of response.fullStream) {
+        switch (part.type) {
+          case "text-delta": {
+            updateNode({
+              nodeId: childId,
+              updater: (data) => ({
+                ...data,
+                message: data.message + part.textDelta,
+              }),
+            })
+            break
+          }
+          case "reasoning": {
+            // console.log(part.textDelta)
+            break
+          }
+          default: {
+            // console.log(part)
+            break
+          }
+        }
+      }
+    } catch (error) {
+      console.error(error)
+      notifications.show({
+        message: (error as Error).message,
+        color: "red",
+      })
+    }
+  }
+
   return (
     <>
       {isChildNode && (
@@ -79,88 +162,12 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
 
       <Paper
         withBorder
-        className={classes.paper}
+        className={classes.nodeContainer}
         component="form"
         p="md"
         shadow="md"
         w="min(calc(100vw - 2rem), 24rem)"
-        onSubmit={async (event) => {
-          event.preventDefault()
-
-          const formData = new FormData(
-            event.currentTarget as unknown as HTMLFormElement,
-          )
-
-          const message = formData.get(GENERATION_CONFIG_KEYS.MESSAGE) as string
-          const model = formData.get(GENERATION_CONFIG_KEYS.MODEL) as string
-
-          const config = getConfig(formData)
-
-          updateNode({
-            nodeId: props.id,
-            updater: (data) => ({
-              ...data,
-              message,
-              config: {
-                model,
-                ...config,
-              },
-            }),
-          })
-
-          const childId = createAssistantNode({ parentId: props.id })
-
-          // Call this to notify that we updated the state of the handler
-          // because bottom handler only appears after we added a child
-          // https://reactflow.dev/learn/troubleshooting#couldnt-create-edge-for-sourcetarget-handle-id-some-id-edge-id-some-id
-          updateNodeInternals(props.id)
-
-          let messages: Array<CoreMessage> = []
-
-          if (props.data.parentId) {
-            // If it has a parent, we build the chat history first
-            const ancestors = getAncestors(props.data.parentId)
-            messages = buildMessages(ancestors)
-          }
-
-          messages.push({
-            role: "user",
-            content: message,
-          })
-
-          const mapper = ALL_MODEL_OPTIONS_MAPPER.get(model)
-          invariant(mapper, `No options parser found for model ${model}`)
-
-          const options = mapper(config)
-
-          const response = streamText({
-            ...options,
-            messages,
-          })
-
-          for await (const part of response.fullStream) {
-            switch (part.type) {
-              case "text-delta": {
-                updateNode({
-                  nodeId: childId,
-                  updater: (data) => ({
-                    ...data,
-                    message: data.message + part.textDelta,
-                  }),
-                })
-                break
-              }
-              case "reasoning": {
-                // console.log(part.textDelta)
-                break
-              }
-              default: {
-                // console.log(part)
-                break
-              }
-            }
-          }
-        }}
+        onSubmit={onSubmit}
       >
         <Stack gap="sm">
           <Badge color="yellow">User</Badge>
@@ -178,14 +185,7 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
               placeholder="Type your prompt here..."
             />
 
-            <Box
-              display="grid"
-              style={{
-                gridTemplateColumns: "1fr auto",
-                alignItems: "center",
-                gap: "var(--mantine-spacing-xs)",
-              }}
-            >
+            <div className={classes.bottomContainer}>
               <Select
                 allowDeselect={false}
                 data={ALL_MODELS}
@@ -206,7 +206,7 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
               >
                 <Icon icon="mingcute:ai-fill" />
               </ActionIcon>
-            </Box>
+            </div>
           </Stack>
 
           <Divider />
@@ -241,8 +241,8 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
                 onClick={toggle}
               >
                 <Icon
-                  className={clsx(classes.moreOptionsButton, {
-                    [classes.moreOptionsButtonActive]: opened,
+                  className={clsx(classes.toggleAdvancedConfig, {
+                    [classes.toggleAdvancedConfigOpen]: opened,
                   })}
                   icon="mingcute:arrows-down-fill"
                 />

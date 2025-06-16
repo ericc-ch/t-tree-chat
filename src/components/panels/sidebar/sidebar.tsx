@@ -1,7 +1,6 @@
 import { Icon } from "@iconify/react/dist/iconify.js"
 import {
   ActionIcon,
-  Box,
   Button,
   Divider,
   Group,
@@ -107,14 +106,14 @@ export function Sidebar() {
           <Divider my="xl" />
 
           <Stack gap="md">
-            <Box>
+            <div>
               <Title order={3}>Account</Title>
               <Text c="dimmed" size="sm">
                 For syncing and stuff
                 <br />
                 (currently just syncing)
               </Text>
-            </Box>
+            </div>
 
             <Stack gap="xs">
               <Button
