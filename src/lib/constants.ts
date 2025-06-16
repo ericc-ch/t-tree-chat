@@ -9,10 +9,13 @@ export const MODEL_OPTIONS: Array<ComboboxItemGroup> = [
 ]
 
 export const GENERATION_CONFIG_KEYS = {
-  USER_PROMPT: "userPrompt",
+  MESSAGE: "message",
   MODEL: "model",
   SYSTEM_PROMPT: "systemPrompt",
   TEMPERATURE: "temperature",
   THINKING_MODE: "thinkingMode",
+  MANUAL_THINKING_BUDGET: "manualThinkingBudget",
   THINKING_BUDGET: "thinkingBudget",
 }
+
+export const NODE_ORIGIN: [number, number] = [0.5, 0]

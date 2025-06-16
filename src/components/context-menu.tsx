@@ -1,6 +1,7 @@
 import type { ReactFlowInstance } from "@xyflow/react"
 import type React from "react"
 
+import { Icon } from "@iconify/react"
 import { Menu } from "@mantine/core"
 import invariant from "tiny-invariant"
 
@@ -34,6 +35,7 @@ export function ContextMenu() {
 
       <Menu.Dropdown>
         <Menu.Item
+          leftSection={<Icon fontSize={14} icon="mingcute:add-fill" />}
           onClick={() => {
             const menuTarget = getMenuTarget()
             const position = menuTarget.dataset.position
@@ -47,7 +49,11 @@ export function ContextMenu() {
         >
           New Chat
         </Menu.Item>
-        <Menu.Item>Settings</Menu.Item>
+        <Menu.Item
+          leftSection={<Icon fontSize={14} icon="mingcute:key-2-fill" />}
+        >
+          Set API keys
+        </Menu.Item>
       </Menu.Dropdown>
     </Menu>
   )

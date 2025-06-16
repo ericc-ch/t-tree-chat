@@ -36,7 +36,7 @@ const Temperature = ({ defaultValue }: FieldProps<number>) => (
       <Text size="sm">Temperature</Text>
       <Slider
         // React flow utility classes
-        // https://reactflow.dev/learn/customization/custom-nodes#nodrag
+        // https://reactflow.dev/api-reference/react-flow#nodragclassname
         className="nodrag"
         color="blue"
         defaultValue={defaultValue}
@@ -59,7 +59,9 @@ const ThinkingMode = ({ defaultValue }: FieldProps<boolean>) => (
   <Switch
     defaultChecked={defaultValue}
     label="Thinking mode"
+    labelPosition="left"
     name={GENERATION_CONFIG_KEYS.THINKING_MODE}
+    value="on"
   />
 )
 
@@ -73,6 +75,14 @@ const ThinkingBudget = ({ defaultValue }: FieldProps<number>) => (
   />
 )
 
+const ManualThinkingBudget = ({ defaultValue }: FieldProps<boolean>) => (
+  <Switch
+    defaultChecked={defaultValue}
+    label="Manual thinking budget"
+    name={GENERATION_CONFIG_KEYS.MANUAL_THINKING_BUDGET}
+  />
+)
+
 export const settingsFieldMap = new Map<
   keyof AdvancedModelSettings,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -81,5 +91,6 @@ export const settingsFieldMap = new Map<
   ["systemPrompt", SystemPrompt],
   ["temperature", Temperature],
   ["thinkingMode", ThinkingMode],
+  ["manualThinkingBudget", ManualThinkingBudget],
   ["thinkingBudget", ThinkingBudget],
 ])

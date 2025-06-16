@@ -16,7 +16,7 @@ import {
   useUpdateNodeInternals,
   type NodeProps,
 } from "@xyflow/react"
-import { streamText } from "ai"
+import { streamText, type CoreMessage } from "ai"
 import clsx from "clsx"
 import { useState } from "react"
 import invariant from "tiny-invariant"
@@ -24,10 +24,9 @@ import invariant from "tiny-invariant"
 import type { AdvancedModelSettings } from "~/src/providers/types"
 
 import { GENERATION_CONFIG_KEYS, MODEL_OPTIONS } from "~/src/lib/constants"
-import { buildMessages } from "~/src/lib/utils"
 import {
-  getGoogleModel,
   GOOGLE_MODEL_AVAILABLE_SETTINGS,
+  GOOGLE_MODEL_OPTIONS_PARSERS,
 } from "~/src/providers/google"
 import { useFlowStore, type UserMessageNode } from "~/src/stores/flow"
 
@@ -75,42 +74,88 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
       <Paper
         withBorder
         component="form"
-        miw="min(calc(100vw - 2rem), 24rem)"
         p="md"
         shadow="md"
-        onSubmit={async (e) => {
-          e.preventDefault()
+        w="min(calc(100vw - 2rem), 24rem)"
+        // eslint-disable-next-line max-lines-per-function
+        onSubmit={async (event) => {
+          event.preventDefault()
 
           const formData = new FormData(
-            e.currentTarget as unknown as HTMLFormElement,
+            event.currentTarget as unknown as HTMLFormElement,
           )
 
+          console.log(formData)
+
+          const message = formData.get(GENERATION_CONFIG_KEYS.MESSAGE) as string
+
           const model = formData.get("model") as string
+          const systemPrompt = formData.get(
+            GENERATION_CONFIG_KEYS.SYSTEM_PROMPT,
+          ) as string
+          const temperature = Number.parseFloat(
+            formData.get(GENERATION_CONFIG_KEYS.TEMPERATURE) as string,
+          )
+          const thinkingMode =
+            formData.get(GENERATION_CONFIG_KEYS.THINKING_MODE) === "on"
+          const manualThinkingBudget = Boolean(
+            formData.get(GENERATION_CONFIG_KEYS.MANUAL_THINKING_BUDGET),
+          )
+          const thinkingBudget = Number.parseInt(
+            formData.get(GENERATION_CONFIG_KEYS.THINKING_BUDGET) as string,
+            10,
+          )
+
+          updateNode({
+            nodeId: props.id,
+            updater: (data) => ({
+              ...data,
+              message,
+              config: {
+                model,
+                systemPrompt,
+                temperature,
+                thinkingMode,
+                manualThinkingBudget,
+                thinkingBudget,
+              },
+            }),
+          })
 
           const childId = createAssistantNode({ parentId: props.id })
+
+          // Call this to notify that we updated the state of the handler
+          // because bottom handler only appears after we added a child
+          // https://reactflow.dev/learn/troubleshooting#couldnt-create-edge-for-sourcetarget-handle-id-some-id-edge-id-some-id
           updateNodeInternals(props.id)
 
           if (props.parentId) {
             // Stub
           } else {
             // This means this is a root node
-            const messages = buildMessages([props])
+            const messages: Array<CoreMessage> = [
+              {
+                role: "user",
+                content: formData.get(GENERATION_CONFIG_KEYS.MESSAGE) as string,
+              },
+            ]
+            const parser = GOOGLE_MODEL_OPTIONS_PARSERS.get(model)
+            invariant(parser, `No options parser found for model ${model}`)
+
+            const options = parser(event)
 
             const { textStream } = streamText({
-              model: getGoogleModel(model),
               messages,
-              providerOptions: {
-                thinkingConfig: {
-                  thinkingBudget: 0,
-                },
-              },
+              ...options,
             })
 
             for await (const textPart of textStream) {
+              console.log(textPart)
               updateNode({
                 nodeId: childId,
                 updater: (data) => ({
-                  message: data.config.userPrompt + textPart,
+                  ...data,
+                  message: data.message + textPart,
                 }),
               })
             }
@@ -120,11 +165,11 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
         <Stack gap="sm">
           <Textarea
             autosize
-            defaultValue={props.data.config.userPrompt}
+            defaultValue={props.data.message}
             label="User prompt"
             maxRows={6}
             minRows={4}
-            name={GENERATION_CONFIG_KEYS.USER_PROMPT}
+            name={GENERATION_CONFIG_KEYS.MESSAGE}
             placeholder="Type your prompt here..."
           />
 

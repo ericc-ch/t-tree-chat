@@ -8,6 +8,6 @@ export const buildMessages = (
   nodes.map((node) => {
     return {
       role: node.type === "userMessage" ? "user" : "assistant",
-      content: node.data.config.userPrompt,
+      content: node.data.message,
     }
   })

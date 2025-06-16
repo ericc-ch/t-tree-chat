@@ -1,0 +1,9 @@
+.container {
+  overflow-y: auto;
+  max-height: 540px;
+}
+
+.pre {
+  overflow-x: auto;
+  max-width: 100%;
+}

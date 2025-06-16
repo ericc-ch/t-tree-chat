@@ -5,15 +5,27 @@ import {
   type XYPosition,
   addEdge,
   applyNodeChanges,
+  getNodesBounds,
 } from "@xyflow/react"
 import invariant from "tiny-invariant"
 import { create } from "zustand"
 
+import { NODE_ORIGIN } from "../lib/constants"
 import { GOOGLE_MODELS } from "../providers/google"
 
-export interface MessageNodeData extends Record<string, unknown> {
+export interface GenerationConfig {
+  model: string
+  systemPrompt: string
+  temperature: number
+  thinkingMode: boolean
+  manualThinkingBudget: boolean
+  thinkingBudget: number
+}
+
+interface MessageNodeData extends Record<string, unknown> {
   config: GenerationConfig
 
+  message: string
   parentId?: string
   childrenIds: Array<string>
 }
@@ -23,16 +35,7 @@ export type AssistantMessageNode = Node<MessageNodeData, "assistantMessage">
 
 export type FlowNode = UserMessageNode | AssistantMessageNode
 
-export interface GenerationConfig {
-  userPrompt: string
-  model: string
-  systemPrompt: string
-  temperature: number
-  thinkingMode: boolean
-  thinkingBudget: number
-}
-
-export interface FlowState {
+interface FlowState {
   nodes: Array<FlowNode>
   edges: Array<Edge>
 
@@ -81,16 +84,17 @@ export const useFlowStore = create<FlowState>((set, get) => ({
       type: "userMessage",
       position,
       data: {
+        message: "",
+        parentId: undefined,
+        childrenIds: [],
         config: {
-          userPrompt: "",
           model: GOOGLE_MODELS[0].value,
           systemPrompt: "",
           temperature: 0.5,
           thinkingMode: false,
+          manualThinkingBudget: false,
           thinkingBudget: 0,
         },
-        parentId: undefined,
-        childrenIds: [],
       },
     }
 
@@ -115,17 +119,33 @@ export const useFlowStore = create<FlowState>((set, get) => ({
     const parentNode = nodes.find((node) => node.id === parentId)
     invariant(parentNode, `Parent node not found for ${parentId}`)
 
+    const parentRect = getNodesBounds([parentNode], { nodeOrigin: NODE_ORIGIN })
+    const siblingCount = parentNode.data.childrenIds.length
+
+    const HORIZONTAL_PADDING = 20
+    const VERTICAL_PADDING = 40
+
     const newNode: FlowNode = {
       id: nodeId,
       type,
       position: {
-        x: parentNode.position.x,
-        y: parentNode.position.y + 400,
+        x:
+          // Approximate offset from siblings
+          // Also the last value is padding (only if there are siblings)
+          // siblingCount * (16 * 24)
+          // + parentNode.position.x
+          // + siblingCount * HORIZONTAL_PADDING,
+
+          // Turns out doing the above is kinda annoying
+          parentNode.position.x + siblingCount * HORIZONTAL_PADDING,
+        // Add some space between nodes (last value)
+        y: parentRect.y + parentRect.height + VERTICAL_PADDING,
       },
       data: {
-        config: parentNode.data.config,
+        message: "",
         parentId,
         childrenIds: [],
+        config: parentNode.data.config,
       },
     }
 

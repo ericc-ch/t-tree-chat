@@ -1,5 +1,4 @@
 import { MantineProvider } from "@mantine/core"
-import { ModalsProvider } from "@mantine/modals"
 import {
   Background,
   BackgroundVariant,
@@ -11,21 +10,28 @@ import {
 } from "@xyflow/react"
 
 import { ContextMenu, menuClickListener } from "./components/context-menu"
+import { AssistantMessageNode } from "./components/nodes/assistant-message/assistant-message"
+import { UserMessageNode } from "./components/nodes/user-message/user-message"
+import { Settings } from "./components/panels/settings"
+import { NODE_ORIGIN } from "./lib/constants"
+import { useFlowStore, type FlowNode } from "./stores/flow"
 
 // Mantine
 import "@mantine/core/styles.layer.css"
+// import "@mantine/code-highlight/styles.layer.css"
 // React Flow
 import "@xyflow/react/dist/style.css"
+// Highlight.js
+// import "highlight.js/styles/github.css"
 
 // Custom
 import "./styles/global.css"
-import { UserMessageNode } from "./components/nodes/user-message/user-message"
-import { Settings } from "./components/panels/settings"
-import { useFlowStore } from "./stores/flow"
 
 const nodeTypes = {
   userMessage: UserMessageNode,
-}
+  assistantMessage: AssistantMessageNode,
+  // Thanks TypeScript for `satisfies`
+} satisfies Record<FlowNode["type"], unknown>
 
 function Main() {
   const instance = useReactFlow()
@@ -41,7 +47,7 @@ function Main() {
         <ReactFlow
           zoomOnDoubleClick
           edges={edges}
-          nodeOrigin={[0.5, 0]}
+          nodeOrigin={NODE_ORIGIN}
           nodes={nodes}
           nodeTypes={nodeTypes}
           panOnDrag={false}
@@ -65,12 +71,10 @@ function Main() {
 
 export function App() {
   return (
-    <MantineProvider>
-      <ModalsProvider>
-        <ReactFlowProvider>
-          <Main />
-        </ReactFlowProvider>
-      </ModalsProvider>
-    </MantineProvider>
+    <ReactFlowProvider>
+      <MantineProvider>
+        <Main />
+      </MantineProvider>
+    </ReactFlowProvider>
   )
 }
