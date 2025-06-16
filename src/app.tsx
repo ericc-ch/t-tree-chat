@@ -56,10 +56,11 @@ function Main() {
           panOnDrag={false}
           panOnScroll={true}
           selectionMode={SelectionMode.Partial}
-          onNodesChange={onNodesChange}
-          onPaneClick={(event) => {
+          onContextMenu={(event) => {
+            event.preventDefault()
             menuClickListener({ event, instance })
           }}
+          onNodesChange={onNodesChange}
         >
           <Background gap={32} variant={BackgroundVariant.Cross} />
           <Controls />

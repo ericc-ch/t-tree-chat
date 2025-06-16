@@ -16,7 +16,6 @@ import { Panel } from "@xyflow/react"
 import { useState } from "react"
 
 import { useSettingsStore } from "~/src/stores/settings"
-import { useUIStore } from "~/src/stores/ui"
 
 import classes from "./settings.module.css"
 
@@ -24,7 +23,6 @@ import classes from "./settings.module.css"
 export function Settings() {
   const [isOpen, setIsOpen] = useState(false)
   const setAPIKeys = useSettingsStore((store) => store.setAPIKeys)
-  const closeContextMenu = useUIStore((store) => store.closeContextMenu)
 
   if (!isOpen) {
     return (
@@ -37,7 +35,6 @@ export function Settings() {
           variant="outline"
           onClick={() => {
             setIsOpen(true)
-            closeContextMenu()
           }}
         >
           <Icon icon="mingcute:align-arrow-right-fill" />
@@ -80,7 +77,6 @@ export function Settings() {
               notifications.show({
                 withBorder: true,
                 message: "API keys saved!",
-                color: "green",
               })
             }}
           >

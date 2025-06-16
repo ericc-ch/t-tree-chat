@@ -12,7 +12,7 @@ import { useUIStore } from "../stores/ui"
 
 export function ContextMenu() {
   const opened = useUIStore((state) => state.isContextMenuOpen)
-  const close = useUIStore((state) => state.closeContextMenu)
+  const setOpened = useUIStore((state) => state.setContextMenuOpen)
 
   const createRootNode = useFlowStore((state) => state.createRootNode)
 
@@ -22,6 +22,7 @@ export function ContextMenu() {
       opened={opened}
       position="right-start"
       shadow="md"
+      onChange={setOpened}
     >
       <Menu.Target>
         <div
@@ -44,7 +45,6 @@ export function ContextMenu() {
             const [x, y] = position.split(",").map(Number)
 
             createRootNode({ position: { x, y } })
-            close()
           }}
         >
           New Chat
@@ -77,5 +77,5 @@ export function menuClickListener(options: menuClickListenerOptions) {
   menuTarget.style.top = `${options.event.clientY}px`
   menuTarget.dataset.position = `${position.x},${position.y}`
 
-  useUIStore.getState().toggleContextMenu()
+  useUIStore.getState().openContextMenu()
 }
