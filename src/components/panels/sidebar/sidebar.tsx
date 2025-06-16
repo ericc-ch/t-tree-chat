@@ -117,13 +117,6 @@ export function Sidebar() {
 
             <Stack gap="xs">
               <Button
-                leftSection={<Icon icon="mingcute:google-fill" />}
-                type="submit"
-                variant="outline"
-              >
-                Sign in with Google
-              </Button>
-              <Button
                 leftSection={<Icon icon="mingcute:github-fill" />}
                 type="submit"
                 variant="outline"
