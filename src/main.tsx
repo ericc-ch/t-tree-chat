@@ -3,6 +3,14 @@ import { createRoot } from "react-dom/client"
 
 import { syncConversation } from "./api/sync.ts"
 import { App } from "./app.tsx"
+import { cleanDoubleSlashes } from "./lib/utils.ts"
+
+if (
+  globalThis.location.pathname
+  === cleanDoubleSlashes(`${import.meta.env.BASE_URL}/oauth`)
+) {
+  globalThis.location.href = "/"
+}
 
 const root = document.querySelector("#root")
 if (!root) throw new Error("No root element found")

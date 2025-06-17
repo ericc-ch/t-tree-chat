@@ -304,8 +304,9 @@ export const useFlowStore = create<FlowState>((set, get) => ({
       currentLastUpdated && lastUpdated && lastUpdated <= currentLastUpdated
 
     if (isOutdated && !options?.force) {
-      throw new Error(
+      throw new ImportError(
         "Imported data is older than or same as the current data. Use force to merge anyway.",
+        { type: "outdated" },
       )
     }
 
@@ -326,3 +327,13 @@ export const useFlowStore = create<FlowState>((set, get) => ({
     })
   },
 }))
+
+export class ImportError extends Error {
+  type: string
+
+  constructor(message: string, { type }: { type: string }) {
+    super(message)
+    this.name = "ImportError"
+    this.type = type
+  }
+}
