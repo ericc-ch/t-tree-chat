@@ -1,18 +1,9 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { signOut } from "firebase/auth"
+import { pb } from "~/src/lib/pocketbase"
+import { queryClient } from "~/src/lib/query"
 
-import { auth } from "../lib/firebase"
 import { getUser } from "./get-user"
 
-export const useSignOut = () => {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: async () => {
-      await signOut(auth)
-    },
-    onSuccess: () => {
-      void queryClient.resetQueries(getUser)
-    },
-  })
+export const signOut = async () => {
+  pb.authStore.clear()
+  await queryClient.resetQueries(getUser)
 }

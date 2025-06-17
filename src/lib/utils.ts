@@ -28,3 +28,13 @@ export const stringToFile = (str: string, filename: string) => {
 
   return file
 }
+
+export const objToFormData = (obj: Record<string, string | File>) => {
+  const formData = new FormData()
+
+  for (const [key, value] of Object.entries(obj)) {
+    formData.append(key, value)
+  }
+
+  return formData
+}

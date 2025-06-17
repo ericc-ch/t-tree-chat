@@ -1,20 +1,22 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { AppwriteException } from "appwrite"
 import { ofetch } from "ofetch"
+import { ClientResponseError } from "pocketbase"
 import invariant from "tiny-invariant"
 
-import { storage } from "../lib/appwrite"
-import { APPWRITE_BUCKET_ID } from "../lib/constants"
+import { compress, decompress } from "~/src/lib/compression"
+import { pb } from "~/src/lib/pocketbase"
+import { objToFormData } from "~/src/lib/utils"
+
 import { queryClient } from "../lib/query"
-import { stringToFile } from "../lib/utils"
-import { ImportError, useFlowStore } from "../stores/flow"
+import { useFlowStore } from "../stores/flow"
 import { useUIStore } from "../stores/ui"
 import { getUser } from "./get-user"
 
 export const useSync = () => {
   const userQuery = useQuery(getUser)
   const setSyncing = useUIStore((store) => store.setSyncing)
-  const { exportJSON, importJSON } = useFlowStore()
+  const exportJSON = useFlowStore((state) => state.exportJSON)
+  const importJSON = useFlowStore((state) => state.importJSON)
 
   const mutationFn = async () => {
     setSyncing(true)
@@ -22,51 +24,47 @@ export const useSync = () => {
     try {
       const user = userQuery.data
       invariant(user, "Cannot sync when not logged in")
-      const fileId = user.$id
 
-      try {
-        const url = storage.getFileView(APPWRITE_BUCKET_ID.SYNC, fileId)
-
-        // Return text as is
-        const response = await ofetch<string>(url, {
-          parseResponse: (txt) => txt,
+      const createFlow = async (json: string) => {
+        const compressed = await compress(json, "flow.gz")
+        const formData = objToFormData({
+          user: user.id,
+          flow: compressed,
         })
 
-        console.log(response)
-
-        importJSON(response)
-      } catch (error) {
-        console.log(JSON.stringify(error, null, 2))
-        const isFileNotFound =
-          (error as AppwriteException).type === "storage_file_not_found"
-        const isOutdated =
-          error instanceof ImportError && error.type === "outdated"
-
-        // If neither of these errors, rethrow
-        if (!isFileNotFound && !isOutdated) {
-          throw error
-        }
+        return await pb.collection("flows").create(formData)
       }
 
       const flowJSON = exportJSON()
-      const file = stringToFile(flowJSON, `${fileId}.json`)
 
-      const uploadFile = () =>
-        storage.createFile(APPWRITE_BUCKET_ID.SYNC, fileId, file)
-
-      // TODO: Implement real syncing solution, I don't want to use appwrite database though
-      // We're gonna delete then reupload
-      // Ultra high IQ I know
-      // I also somehow find .then().catch() easier to read
-      await storage
-        .deleteFile(APPWRITE_BUCKET_ID.SYNC, fileId)
-        .then(uploadFile)
+      const remoteFlow = await pb
+        .collection("flows")
+        .getFirstListItem(`user = "${user.id}"`)
         .catch((error: unknown) => {
-          if ((error as AppwriteException).type === "storage_file_not_found")
-            return storage.createFile(APPWRITE_BUCKET_ID.SYNC, fileId, file)
+          if (error instanceof ClientResponseError && error.status === 404) {
+            return createFlow(flowJSON)
+          }
 
           throw error
         })
+
+      const fileUrl = pb.files.getURL(remoteFlow, remoteFlow.flow as string)
+      const response = await ofetch(fileUrl, { responseType: "blob" })
+
+      const json = await decompress(new File([response], "flow.gz"))
+      const merged = importJSON(json)
+
+      const updateFlow = async () => {
+        const compressed = await compress(merged, "flow.gz")
+        const formData = objToFormData({
+          user: user.id,
+          flow: compressed,
+        })
+
+        return await pb.collection("flows").update(remoteFlow.id, formData)
+      }
+
+      return await updateFlow()
     } finally {
       setSyncing(false)
     }
@@ -80,35 +78,54 @@ export const useSync = () => {
 // Non hook version
 export const syncConversation = async () => {
   const { setSyncing } = useUIStore.getState()
+  const { exportJSON, importJSON } = useFlowStore.getState()
 
   try {
     setSyncing(true)
 
     const user = await queryClient.ensureQueryData(getUser)
     invariant(user, "Cannot sync when not logged in.")
-    const fileId = user.$id
 
-    const { exportJSON } = useFlowStore.getState()
+    const createFlow = async (json: string) => {
+      const compressed = await compress(json, "flow.gz")
+      const formData = objToFormData({
+        user: user.id,
+        flow: compressed,
+      })
+
+      return await pb.collection("flows").create(formData)
+    }
 
     const flowJSON = exportJSON()
-    const file = stringToFile(flowJSON, `${fileId}.json`)
 
-    const uploadFile = () =>
-      storage.createFile(APPWRITE_BUCKET_ID.SYNC, fileId, file)
-
-    // TODO: Implement real syncing solution, I don't want to use appwrite database though
-    // We're gonna delete then reupload
-    // Ultra high IQ I know
-    // I also somehow find .then().catch() easier to read
-    await storage
-      .deleteFile(APPWRITE_BUCKET_ID.SYNC, fileId)
-      .then(uploadFile)
+    const remoteFlow = await pb
+      .collection("flows")
+      .getFirstListItem(`user = "${user.id}"`)
       .catch((error: unknown) => {
-        if ((error as AppwriteException).type === "storage_file_not_found")
-          return storage.createFile(APPWRITE_BUCKET_ID.SYNC, fileId, file)
+        if (error instanceof ClientResponseError && error.status === 404) {
+          return createFlow(flowJSON)
+        }
 
         throw error
       })
+
+    const fileUrl = pb.files.getURL(remoteFlow, remoteFlow.flow as string)
+    const response = await ofetch(fileUrl, { responseType: "blob" })
+
+    const json = await decompress(new File([response], "flow.gz"))
+    const merged = importJSON(json)
+
+    const updateFlow = async () => {
+      const compressed = await compress(merged, "flow.gz")
+      const formData = objToFormData({
+        user: user.id,
+        flow: compressed,
+      })
+
+      return await pb.collection("flows").update(remoteFlow.id, formData)
+    }
+
+    return await updateFlow()
   } finally {
     setSyncing(false)
   }

@@ -19,6 +19,8 @@ import {
 } from "./components/context-menu/context-menu"
 import { AssistantMessageNode } from "./components/nodes/assistant-message/assistant-message"
 import { UserMessageNode } from "./components/nodes/user-message/user-message"
+import { TopLeftPanel } from "./components/panels/top-left"
+import { NODE_ORIGIN } from "./lib/constants"
 
 // Mantine
 import "@mantine/core/styles.layer.css"
@@ -31,8 +33,6 @@ import "@xyflow/react/dist/style.css"
 
 // Custom
 import "./styles/global.css"
-import { TopLeftPanel } from "./components/panels/top-left"
-import { NODE_ORIGIN } from "./lib/constants"
 import { queryClient } from "./lib/query"
 import { useFlowStore, type FlowNode } from "./stores/flow"
 

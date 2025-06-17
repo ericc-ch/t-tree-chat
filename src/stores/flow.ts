@@ -33,8 +33,6 @@ interface FlowState {
   nodes: Array<FlowNode>
   edges: Array<Edge>
 
-  lastUpdated?: number
-
   // React Flow handlers
   onNodesChange: OnNodesChange<FlowNode>
 
@@ -55,7 +53,7 @@ interface FlowState {
 
   // Syncing
   exportJSON: () => string
-  importJSON: (json: string, options?: { force?: boolean }) => void
+  importJSON: (json: string, options?: { force?: boolean }) => string
 
   // Internal actions
   _createChildNode: (options: {
@@ -281,50 +279,34 @@ export const useFlowStore = create<FlowState>((set, get) => ({
     return JSON.stringify({
       nodes,
       edges,
-      lastUpdated: Date.now(),
     })
   },
 
-  importJSON: (json, options) => {
-    const {
-      nodes: importedNodes,
-      edges: importedEdges,
-      lastUpdated,
-    } = JSON.parse(json) as Pick<FlowState, "nodes" | "edges"> & {
-      lastUpdated: number
-    }
+  importJSON: (json) => {
+    const { nodes: importedNodes, edges: importedEdges } = JSON.parse(
+      json,
+    ) as Pick<FlowState, "nodes" | "edges">
 
-    const {
-      nodes: currentNodes,
-      edges: currentEdges,
-      lastUpdated: currentLastUpdated,
-    } = get()
+    const { nodes: currentNodes, edges: currentEdges } = get()
 
-    const isOutdated =
-      currentLastUpdated && lastUpdated && lastUpdated <= currentLastUpdated
-
-    if (isOutdated && !options?.force) {
-      throw new ImportError(
-        "Imported data is older than or same as the current data. Use force to merge anyway.",
-        { type: "outdated" },
-      )
-    }
-
-    const nodeMap = new Map(currentNodes.map((node) => [node.id, node]))
-    for (const node of importedNodes) {
+    const nodeMap = new Map(importedNodes.map((node) => [node.id, node]))
+    for (const node of currentNodes) {
       nodeMap.set(node.id, node)
     }
 
-    const edgeMap = new Map(currentEdges.map((edge) => [edge.id, edge]))
-    for (const edge of importedEdges) {
+    const edgeMap = new Map(importedEdges.map((edge) => [edge.id, edge]))
+    for (const edge of currentEdges) {
       edgeMap.set(edge.id, edge)
     }
 
-    set({
+    const mergedState = {
       nodes: Array.from(nodeMap.values()),
       edges: Array.from(edgeMap.values()),
-      lastUpdated: lastUpdated,
-    })
+    }
+
+    set(mergedState)
+
+    return JSON.stringify(mergedState)
   },
 }))
 

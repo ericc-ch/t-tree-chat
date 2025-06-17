@@ -1,11 +1,11 @@
 import { queryOptions } from "@tanstack/react-query"
 
-import { auth } from "../lib/firebase"
+import { pb } from "../lib/pocketbase"
 
 export const getUser = queryOptions({
   queryKey: ["user"],
   queryFn: () => {
-    const user = auth.currentUser
+    const user = pb.authStore.record
     if (!user) throw new AuthError("Not logged in", { type: "not_logged_in" })
 
     return user

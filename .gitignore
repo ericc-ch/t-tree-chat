@@ -22,3 +22,9 @@ dist-ssr
 *.sw?
 
 .aider*
+
+# Pocketbase
+pocketbase-bin
+pb_data/
+pb_public/
+pb_migrations/

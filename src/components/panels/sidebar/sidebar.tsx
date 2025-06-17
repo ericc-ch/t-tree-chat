@@ -13,27 +13,22 @@ import {
 } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
 import { useQuery } from "@tanstack/react-query"
-import { GithubAuthProvider } from "firebase/auth"
-import { useState, type FormEvent, type FormEventHandler } from "react"
+import { useEffect, type FormEvent, type FormEventHandler } from "react"
 
 import { getUser } from "~/src/api/get-user"
 import { useSignIn } from "~/src/api/sign-in"
-import { useSignOut } from "~/src/api/sign-out"
+import { signOut } from "~/src/api/sign-out"
 import { useSync } from "~/src/api/sync"
 import { useSettingsStore } from "~/src/stores/settings"
+import { useUIStore } from "~/src/stores/ui"
 
 import classes from "./sidebar.module.css"
 
 export function Sidebar() {
-  const [isOpen, setIsOpen] = useState(false)
+  const isSidebarOpen = useUIStore((state) => state.isSidebarOpen)
+  const openSidebar = useUIStore((state) => state.openSidebar)
+  const closeSidebar = useUIStore((state) => state.closeSidebar)
   const setAPIKeys = useSettingsStore((store) => store.setAPIKeys)
-
-  const onOpen = () => {
-    setIsOpen(true)
-  }
-  const onClose = () => {
-    setIsOpen(false)
-  }
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -52,19 +47,20 @@ export function Sidebar() {
 
   const userQuery = useQuery(getUser)
   const signIn = useSignIn()
-  const signOut = useSignOut()
 
   const sync = useSync()
 
+  useEffect(() => {
+    if (!userQuery.isSuccess) return
+    sync.mutate()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sync.mutate, userQuery.isSuccess])
+
   const onGithubSignIn = () => {
-    signIn.mutate(new GithubAuthProvider())
+    signIn.mutate("github")
   }
 
-  const onSignOut = () => {
-    signOut.mutate()
-  }
-
-  if (!isOpen) {
+  if (!isSidebarOpen) {
     return (
       <ActionIcon
         aria-label="Open sidebar"
@@ -72,7 +68,7 @@ export function Sidebar() {
         size="lg"
         title="Open sidebar"
         variant="outline"
-        onClick={onOpen}
+        onClick={openSidebar}
       >
         <Icon icon="mingcute:align-arrow-right-fill" />
       </ActionIcon>
@@ -112,7 +108,7 @@ export function Sidebar() {
             aria-label="Close sidebar"
             title="Close sidebar"
             variant="outline"
-            onClick={onClose}
+            onClick={closeSidebar}
           >
             <Icon icon="mingcute:close-fill" />
           </ActionIcon>
@@ -168,11 +164,8 @@ export function Sidebar() {
           {userQuery.data ?
             <>
               <Group>
-                <Avatar
-                  color="initials"
-                  name={userQuery.data.displayName ?? "John Doe"}
-                />
-                <Text>{userQuery.data.displayName}</Text>
+                <Avatar color="initials" name={userQuery.data.name as string} />
+                <Text>{userQuery.data.name}</Text>
               </Group>
 
               <Stack gap="xs">
@@ -188,10 +181,9 @@ export function Sidebar() {
                 <Button
                   color="red"
                   leftSection={<Icon icon="mingcute:exit-fill" />}
-                  loading={signOut.isPending}
                   type="submit"
                   variant="outline"
-                  onClick={onSignOut}
+                  onClick={signOut}
                 >
                   Sign out
                 </Button>
