@@ -1,3 +1,7 @@
+.paper {
+  overflow-y: auto;
+}
+
 .toggleSidebar {
   box-shadow: var(--mantine-shadow-lg);
 }

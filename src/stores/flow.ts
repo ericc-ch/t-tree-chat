@@ -33,6 +33,8 @@ interface FlowState {
   nodes: Array<FlowNode>
   edges: Array<Edge>
 
+  lastUpdated?: number
+
   // React Flow handlers
   onNodesChange: OnNodesChange<FlowNode>
 
@@ -53,7 +55,7 @@ interface FlowState {
 
   // Syncing
   exportJSON: () => string
-  importJSON: (json: string) => void
+  importJSON: (json: string, options?: { force?: boolean }) => void
 
   // Internal actions
   _createChildNode: (options: {
@@ -65,6 +67,7 @@ interface FlowState {
 export const useFlowStore = create<FlowState>((set, get) => ({
   nodes: [],
   edges: [],
+  lastUpdated: undefined,
 
   // --- REACT FLOW HANDLERS ---
   onNodesChange: (changes) => {
@@ -275,18 +278,51 @@ export const useFlowStore = create<FlowState>((set, get) => ({
 
   exportJSON: () => {
     const { nodes, edges } = get()
-    return JSON.stringify({ nodes, edges })
-  },
-
-  importJSON: (json) => {
-    const { nodes, edges } = JSON.parse(json) as Pick<
-      FlowState,
-      "nodes" | "edges"
-    >
-
-    set({
+    return JSON.stringify({
       nodes,
       edges,
+      lastUpdated: Date.now(),
+    })
+  },
+
+  importJSON: (json, options) => {
+    const {
+      nodes: importedNodes,
+      edges: importedEdges,
+      lastUpdated,
+    } = JSON.parse(json) as Pick<FlowState, "nodes" | "edges"> & {
+      lastUpdated: number
+    }
+
+    const {
+      nodes: currentNodes,
+      edges: currentEdges,
+      lastUpdated: currentLastUpdated,
+    } = get()
+
+    const isOutdated =
+      currentLastUpdated && lastUpdated && lastUpdated <= currentLastUpdated
+
+    if (isOutdated && !options?.force) {
+      throw new Error(
+        "Imported data is older than or same as the current data. Use force to merge anyway.",
+      )
+    }
+
+    const nodeMap = new Map(currentNodes.map((node) => [node.id, node]))
+    for (const node of importedNodes) {
+      nodeMap.set(node.id, node)
+    }
+
+    const edgeMap = new Map(currentEdges.map((edge) => [edge.id, edge]))
+    for (const edge of importedEdges) {
+      edgeMap.set(edge.id, edge)
+    }
+
+    set({
+      nodes: Array.from(nodeMap.values()),
+      edges: Array.from(edgeMap.values()),
+      lastUpdated: lastUpdated,
     })
   },
 }))

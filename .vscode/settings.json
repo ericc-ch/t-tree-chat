@@ -6,7 +6,8 @@
     "APPWRITE",
     "echristian",
     "mantine",
-    "openrouter"
+    "openrouter",
+    "VITE"
   ],
   "tailwindCSS.classFunctions": ["clsx", "cn", "cva"],
   "typescript.tsdk": "node_modules/typescript/lib"

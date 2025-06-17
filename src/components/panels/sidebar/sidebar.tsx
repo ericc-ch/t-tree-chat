@@ -101,7 +101,14 @@ export function Sidebar() {
   }
 
   return (
-    <Paper withBorder h="calc(100vh - 2rem)" p="sm" shadow="lg" w="16rem">
+    <Paper
+      withBorder
+      className={classes.paper}
+      h="calc(100vh - 2rem)"
+      p="sm"
+      shadow="lg"
+      w="16rem"
+    >
       <Stack gap={0}>
         <Group justify="end">
           <ActionIcon
@@ -144,7 +151,7 @@ export function Sidebar() {
           </Group>
         </Stack>
 
-        <Divider my="xl" />
+        <Divider my="lg" />
 
         <Stack gap="md">
           <div>
