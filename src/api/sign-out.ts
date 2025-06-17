@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { signOut } from "firebase/auth"
 
-import { account } from "../lib/appwrite"
+import { auth } from "../lib/firebase"
 import { getUser } from "./get-user"
 
 export const useSignOut = () => {
@@ -8,7 +9,7 @@ export const useSignOut = () => {
 
   return useMutation({
     mutationFn: async () => {
-      await account.deleteSession("current")
+      await signOut(auth)
     },
     onSuccess: () => {
       void queryClient.resetQueries(getUser)

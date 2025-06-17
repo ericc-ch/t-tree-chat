@@ -13,24 +13,16 @@ import {
 } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
 import { useQuery } from "@tanstack/react-query"
-import { OAuthProvider } from "appwrite"
+import { GithubAuthProvider } from "firebase/auth"
 import { useState, type FormEvent, type FormEventHandler } from "react"
 
 import { getUser } from "~/src/api/get-user"
+import { useSignIn } from "~/src/api/sign-in"
 import { useSignOut } from "~/src/api/sign-out"
 import { useSync } from "~/src/api/sync"
-import { account } from "~/src/lib/appwrite"
 import { useSettingsStore } from "~/src/stores/settings"
 
 import classes from "./sidebar.module.css"
-
-const onGithubSignIn = () => {
-  account.createOAuth2Session(
-    OAuthProvider.Github,
-    import.meta.env.VITE_AUTH_REDIRECT_SUCCESS,
-    import.meta.env.VITE_AUTH_REDIRECT_ERROR,
-  )
-}
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -59,9 +51,14 @@ export function Sidebar() {
   }
 
   const userQuery = useQuery(getUser)
+  const signIn = useSignIn()
   const signOut = useSignOut()
 
   const sync = useSync()
+
+  const onGithubSignIn = () => {
+    signIn.mutate(new GithubAuthProvider())
+  }
 
   const onSignOut = () => {
     signOut.mutate()
@@ -171,8 +168,11 @@ export function Sidebar() {
           {userQuery.data ?
             <>
               <Group>
-                <Avatar color="initials" name={userQuery.data.name} />
-                <Text>{userQuery.data.name}</Text>
+                <Avatar
+                  color="initials"
+                  name={userQuery.data.displayName ?? "John Doe"}
+                />
+                <Text>{userQuery.data.displayName}</Text>
               </Group>
 
               <Stack gap="xs">

@@ -1,10 +1,23 @@
 import { queryOptions } from "@tanstack/react-query"
 
-import { account } from "../lib/appwrite"
+import { auth } from "../lib/firebase"
 
 export const getUser = queryOptions({
   queryKey: ["user"],
-  queryFn: async () => {
-    return await account.get()
+  queryFn: () => {
+    const user = auth.currentUser
+    if (!user) throw new AuthError("Not logged in", { type: "not_logged_in" })
+
+    return user
   },
 })
+
+export class AuthError extends Error {
+  type: string
+
+  constructor(message: string, { type }: { type: string }) {
+    super(message)
+    this.name = "AuthError"
+    this.type = type
+  }
+}

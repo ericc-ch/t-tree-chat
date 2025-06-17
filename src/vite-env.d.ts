@@ -12,8 +12,8 @@ interface ImportMetaEnv {
   readonly VITE_FIREBASE_STORAGE_BUCKET: string
   readonly VITE_FIREBASE_MESSAGING_SENDER_ID: string
 
-  readonly VITE_AUTH_REDIRECT_SUCCESS: string
-  readonly VITE_AUTH_REDIRECT_ERROR: string
+  readonly VITE_OAUTH_REDIRECT_SUCCESS: string
+  readonly VITE_OAUTH_REDIRECT_ERROR: string
 }
 
 interface ImportMeta {
