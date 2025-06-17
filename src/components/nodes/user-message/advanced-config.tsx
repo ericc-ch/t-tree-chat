@@ -9,7 +9,7 @@ import type {
   ModelCapabilities,
 } from "~/src/lib/generation"
 
-import { GENERATION_CONFIG_KEYS } from "~/src/lib/constants"
+import { GENERATION_CONFIG_KEY } from "~/src/lib/constants"
 import { ALL_MODEL_CAPABILITIES } from "~/src/providers/all"
 
 import classes from "./user-message.module.css"
@@ -29,7 +29,7 @@ const SystemPrompt = ({ defaultValue }: FieldProps<string>) => (
     label="System prompt"
     maxRows={6}
     minRows={4}
-    name={GENERATION_CONFIG_KEYS.SYSTEM_PROMPT}
+    name={GENERATION_CONFIG_KEY.SYSTEM_PROMPT}
     placeholder="Optional tone and style instructions for the model"
   />
 )
@@ -51,7 +51,7 @@ const Temperature = ({ defaultValue }: FieldProps<number>) => (
         ]}
         max={1}
         min={0}
-        name={GENERATION_CONFIG_KEYS.TEMPERATURE}
+        name={GENERATION_CONFIG_KEY.TEMPERATURE}
         step={0.05}
       />
     </Stack>
@@ -65,7 +65,7 @@ const ThinkingMode = ({ defaultValue }: FieldProps<boolean>) => (
     defaultChecked={defaultValue}
     label="Thinking mode"
     labelPosition="left"
-    name={GENERATION_CONFIG_KEYS.THINKING_MODE}
+    name={GENERATION_CONFIG_KEY.THINKING_MODE}
     value="on"
   />
 )

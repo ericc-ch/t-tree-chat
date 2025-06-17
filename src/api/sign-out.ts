@@ -11,9 +11,7 @@ export const useSignOut = () => {
       await account.deleteSession("current")
     },
     onSuccess: () => {
-      void queryClient.resetQueries({
-        queryKey: getUser.queryKey,
-      })
+      void queryClient.resetQueries(getUser)
     },
   })
 }

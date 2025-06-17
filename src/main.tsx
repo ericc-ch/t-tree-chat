@@ -1,10 +1,9 @@
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 
+import { syncConversation } from "./api/sync.ts"
 import { App } from "./app.tsx"
 import { cleanDoubleSlashes } from "./lib/utils.ts"
-
-console.log(globalThis.location.pathname)
 
 if (
   globalThis.location.pathname
@@ -22,11 +21,10 @@ createRoot(root).render(
   </StrictMode>,
 )
 
-const save = (event: KeyboardEvent) => {
+const save = async (event: KeyboardEvent) => {
   if ((event.ctrlKey || event.metaKey) && event.key === "s") {
     event.preventDefault()
-
-    console.log("Ctrl+S pressed! Executing custom save logic...")
+    await syncConversation()
   }
 }
 

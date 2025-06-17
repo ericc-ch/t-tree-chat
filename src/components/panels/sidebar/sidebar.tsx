@@ -13,12 +13,12 @@ import {
 } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
 import { useQuery } from "@tanstack/react-query"
-import { Panel } from "@xyflow/react"
 import { OAuthProvider } from "appwrite"
 import { useState, type FormEvent, type FormEventHandler } from "react"
 
 import { getUser } from "~/src/api/get-user"
 import { useSignOut } from "~/src/api/sign-out"
+import { useSync } from "~/src/api/sync"
 import { account } from "~/src/lib/appwrite"
 import { useSettingsStore } from "~/src/stores/settings"
 
@@ -61,91 +61,118 @@ export function Sidebar() {
   const userQuery = useQuery(getUser)
   const signOut = useSignOut()
 
+  const sync = useSync()
+
   const onSignOut = () => {
     signOut.mutate()
   }
 
   if (!isOpen) {
     return (
-      <Panel position="top-left">
-        <ActionIcon
-          aria-label="Open sidebar"
-          className={classes.toggleSidebar}
-          size="lg"
-          title="Open sidebar"
-          variant="outline"
-          onClick={onOpen}
-        >
-          <Icon icon="mingcute:align-arrow-right-fill" />
-        </ActionIcon>
-      </Panel>
+      <ActionIcon
+        aria-label="Open sidebar"
+        className={classes.toggleSidebar}
+        size="lg"
+        title="Open sidebar"
+        variant="outline"
+        onClick={onOpen}
+      >
+        <Icon icon="mingcute:align-arrow-right-fill" />
+      </ActionIcon>
     )
   }
 
+  const onSync = () => {
+    sync.mutate(undefined, {
+      onSuccess: () => {
+        notifications.show({
+          message: "Conversations synced successfully!",
+          withBorder: true,
+        })
+      },
+      onError: (error) => {
+        notifications.show({
+          message: error.message,
+          color: "red",
+          withBorder: true,
+        })
+      },
+    })
+  }
+
   return (
-    <Panel position="center-left">
-      <Paper withBorder h="calc(100vh - 2rem)" p="sm" shadow="lg" w="16rem">
-        <Stack gap={0}>
-          <Group justify="end">
-            <ActionIcon
-              aria-label="Close sidebar"
-              title="Close sidebar"
-              variant="outline"
-              onClick={onClose}
-            >
-              <Icon icon="mingcute:close-fill" />
-            </ActionIcon>
-          </Group>
-
-          <Stack
-            component="form"
-            gap="md"
-            onSubmit={onSubmit as unknown as FormEventHandler<HTMLDivElement>}
+    <Paper withBorder h="calc(100vh - 2rem)" p="sm" shadow="lg" w="16rem">
+      <Stack gap={0}>
+        <Group justify="end">
+          <ActionIcon
+            aria-label="Close sidebar"
+            title="Close sidebar"
+            variant="outline"
+            onClick={onClose}
           >
-            <Title order={3}>API Keys</Title>
+            <Icon icon="mingcute:close-fill" />
+          </ActionIcon>
+        </Group>
 
-            <Stack gap="xs">
-              <PasswordInput
-                label="OpenRouter API Key"
-                name="openrouter"
-                placeholder="sk-or-..."
-              />
-              <PasswordInput
-                label="Gemini API Key"
-                name="google"
-                placeholder="AIzaSy..."
-              />
-            </Stack>
+        <Stack
+          component="form"
+          gap="md"
+          onSubmit={onSubmit as unknown as FormEventHandler<HTMLDivElement>}
+        >
+          <Title order={3}>API Keys</Title>
 
-            <Group justify="end">
-              <Button
-                leftSection={<Icon icon="mingcute:save-2-fill" />}
-                type="submit"
-              >
-                Save
-              </Button>
-            </Group>
+          <Stack gap="xs">
+            <PasswordInput
+              label="OpenRouter API Key"
+              name="openrouter"
+              placeholder="sk-or-..."
+            />
+            <PasswordInput
+              label="Gemini API Key"
+              name="google"
+              placeholder="AIzaSy..."
+            />
           </Stack>
 
-          <Divider my="xl" />
+          <Group justify="end">
+            <Button
+              leftSection={<Icon icon="mingcute:save-2-fill" />}
+              type="submit"
+            >
+              Save
+            </Button>
+          </Group>
+        </Stack>
 
-          <Stack gap="md">
-            <div>
-              <Title order={3}>Account</Title>
-              <Text c="dimmed" size="sm">
-                For syncing and stuff
-                <br />
-                (currently just syncing)
-              </Text>
-            </div>
+        <Divider my="xl" />
 
-            {userQuery.data ?
-              <>
-                <Group>
-                  <Avatar color="initials" name={userQuery.data.name} />
-                  <Text>{userQuery.data.name}</Text>
-                </Group>
+        <Stack gap="md">
+          <div>
+            <Title order={3}>Account</Title>
+            <Text c="dimmed" size="sm">
+              For syncing and stuff
+              <br />
+              (currently just syncing)
+            </Text>
+          </div>
 
+          {userQuery.data ?
+            <>
+              <Group>
+                <Avatar color="initials" name={userQuery.data.name} />
+                <Text>{userQuery.data.name}</Text>
+              </Group>
+
+              <Stack gap="xs">
+                <Button
+                  leftSection={<Icon icon="uil:sync" />}
+                  loading={sync.isPending}
+                  type="submit"
+                  variant="outline"
+                  onClick={onSync}
+                >
+                  Sync now
+                </Button>
                 <Button
                   color="red"
                   leftSection={<Icon icon="mingcute:exit-fill" />}
@@ -156,22 +183,22 @@ export function Sidebar() {
                 >
                   Sign out
                 </Button>
-              </>
-            : <Stack gap="xs">
-                {/* TODO: Add more sign in options */}
-                <Button
-                  leftSection={<Icon icon="mingcute:github-fill" />}
-                  type="submit"
-                  variant="outline"
-                  onClick={onGithubSignIn}
-                >
-                  Sign in with GitHub
-                </Button>
               </Stack>
-            }
-          </Stack>
+            </>
+          : <Stack gap="xs">
+              {/* TODO: Add more sign in options */}
+              <Button
+                leftSection={<Icon icon="mingcute:github-fill" />}
+                type="submit"
+                variant="outline"
+                onClick={onGithubSignIn}
+              >
+                Sign in with GitHub
+              </Button>
+            </Stack>
+          }
         </Stack>
-      </Paper>
-    </Panel>
+      </Stack>
+    </Paper>
   )
 }

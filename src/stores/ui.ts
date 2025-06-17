@@ -7,6 +7,9 @@ interface UIStore {
   openContextMenu: () => void
   closeContextMenu: () => void
   toggleContextMenu: () => void
+
+  isSyncing: boolean
+  setSyncing: (value: boolean) => void
 }
 
 export const useUIStore = create<UIStore>()((set) => ({
@@ -23,5 +26,10 @@ export const useUIStore = create<UIStore>()((set) => ({
   },
   toggleContextMenu: () => {
     set((state) => ({ isContextMenuOpen: !state.isContextMenuOpen }))
+  },
+
+  isSyncing: false,
+  setSyncing: (value: boolean) => {
+    set({ isSyncing: value })
   },
 }))

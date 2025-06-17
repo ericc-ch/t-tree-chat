@@ -1,5 +1,5 @@
 import { GOOGLE_MODELS } from "../providers/google"
-import { GENERATION_CONFIG_KEYS } from "./constants"
+import { GENERATION_CONFIG_KEY } from "./constants"
 
 export interface AdvancedConfig {
   systemPrompt: string
@@ -21,11 +21,11 @@ export const DEFAULT_GENERATION_CONFIG: GenerationConfig = {
 }
 
 export function getConfig(formData: FormData): AdvancedConfig {
-  const systemPrompt = formData.get(GENERATION_CONFIG_KEYS.SYSTEM_PROMPT) as
+  const systemPrompt = formData.get(GENERATION_CONFIG_KEY.SYSTEM_PROMPT) as
     | string
     | null
 
-  const temperatureString = formData.get(GENERATION_CONFIG_KEYS.TEMPERATURE) as
+  const temperatureString = formData.get(GENERATION_CONFIG_KEY.TEMPERATURE) as
     | string
     | null
   const temperature = Number.parseFloat(
@@ -33,7 +33,7 @@ export function getConfig(formData: FormData): AdvancedConfig {
   )
 
   const thinkingMode =
-    formData.get(GENERATION_CONFIG_KEYS.THINKING_MODE) === "on"
+    formData.get(GENERATION_CONFIG_KEY.THINKING_MODE) === "on"
 
   return {
     systemPrompt: systemPrompt ?? DEFAULT_GENERATION_CONFIG.systemPrompt,

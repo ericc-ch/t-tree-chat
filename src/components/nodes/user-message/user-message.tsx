@@ -22,7 +22,7 @@ import clsx from "clsx"
 import { useState, type FormEvent } from "react"
 import invariant from "tiny-invariant"
 
-import { GENERATION_CONFIG_KEYS } from "~/src/lib/constants"
+import { GENERATION_CONFIG_KEY } from "~/src/lib/constants"
 import { getConfig } from "~/src/lib/generation"
 import { buildMessages } from "~/src/lib/utils"
 import { ALL_MODEL_OPTIONS_MAPPER, ALL_MODELS } from "~/src/providers/all"
@@ -55,8 +55,8 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
 
     const formData = new FormData(event.currentTarget)
 
-    const message = formData.get(GENERATION_CONFIG_KEYS.MESSAGE) as string
-    const model = formData.get(GENERATION_CONFIG_KEYS.MODEL) as string
+    const message = formData.get(GENERATION_CONFIG_KEY.MESSAGE) as string
+    const model = formData.get(GENERATION_CONFIG_KEY.MODEL) as string
 
     const config = getConfig(formData)
 
@@ -167,7 +167,7 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
               label="User prompt"
               maxRows={6}
               minRows={4}
-              name={GENERATION_CONFIG_KEYS.MESSAGE}
+              name={GENERATION_CONFIG_KEY.MESSAGE}
               placeholder="Type your prompt here..."
             />
 
@@ -175,7 +175,7 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
               <Select
                 allowDeselect={false}
                 data={ALL_MODELS}
-                name={GENERATION_CONFIG_KEYS.MODEL}
+                name={GENERATION_CONFIG_KEY.MODEL}
                 placeholder="Pick a model"
                 value={selectedModel}
                 onChange={(value) => {

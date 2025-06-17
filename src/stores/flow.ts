@@ -51,6 +51,10 @@ interface FlowState {
 
   deleteNode: (nodeId: string) => void
 
+  // Syncing
+  exportJSON: () => string
+  importJSON: (json: string) => void
+
   // Internal actions
   _createChildNode: (options: {
     parentId: string
@@ -266,6 +270,23 @@ export const useFlowStore = create<FlowState>((set, get) => ({
     set({
       nodes: updatedNodes,
       edges: updatedEdges,
+    })
+  },
+
+  exportJSON: () => {
+    const { nodes, edges } = get()
+    return JSON.stringify({ nodes, edges })
+  },
+
+  importJSON: (json) => {
+    const { nodes, edges } = JSON.parse(json) as Pick<
+      FlowState,
+      "nodes" | "edges"
+    >
+
+    set({
+      nodes,
+      edges,
     })
   },
 }))

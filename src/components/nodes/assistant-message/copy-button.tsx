@@ -19,10 +19,10 @@ export function CopyButton(props: CopyButtonProps) {
       await sleep(2000)
       setShowTooltip(false)
     } catch (error) {
-      console.error(error)
       notifications.show({
         message: (error as Error).message,
         color: "red",
+        withBorder: true,
       })
     }
   }

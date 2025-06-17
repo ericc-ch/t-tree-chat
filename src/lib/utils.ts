@@ -18,3 +18,13 @@ export const sleep = (ms: number) =>
 // Taken from https://github.com/unjs/ufo
 export const cleanDoubleSlashes = (input: string) =>
   input.replaceAll(/\/{2,}/g, "/")
+
+export const stringToFile = (str: string, filename: string) => {
+  const blob = new Blob([str], { type: "application/json" })
+  const file = new File([blob], filename, {
+    type: blob.type,
+    lastModified: Date.now(),
+  })
+
+  return file
+}
