@@ -151,8 +151,13 @@ export function Sidebar() {
             <Title order={3}>Account</Title>
             <Text c="dimmed" size="sm">
               For syncing and stuff
-              <br />
+            </Text>
+            <Text c="dimmed" size="xs">
               (currently just syncing)
+            </Text>
+            <Text c="orange" mt="xs" size="xs">
+              Note: API keys are saved locally and are not synced with your
+              account.
             </Text>
           </div>
 
