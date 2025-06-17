@@ -1,4 +1,5 @@
 import config from "@echristian/eslint-config"
+import pluginQuery from "@tanstack/eslint-plugin-query"
 
 export default config(
   {
@@ -20,5 +21,9 @@ export default config(
     rules: {
       "max-lines-per-function": "off",
     },
+  },
+  {
+    // @ts-expect-error because its 2AM and I don't care
+    extends: [...pluginQuery.configs["flat/recommended"]],
   },
 )

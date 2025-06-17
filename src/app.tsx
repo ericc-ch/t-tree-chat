@@ -1,5 +1,6 @@
 import { MantineProvider } from "@mantine/core"
 import { Notifications } from "@mantine/notifications"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import {
   Background,
   BackgroundVariant,
@@ -20,7 +21,6 @@ import { AssistantMessageNode } from "./components/nodes/assistant-message/assis
 import { UserMessageNode } from "./components/nodes/user-message/user-message"
 import { Sidebar } from "./components/panels/sidebar/sidebar"
 import { NODE_ORIGIN } from "./lib/constants"
-import { useFlowStore, type FlowNode } from "./stores/flow"
 
 // Mantine
 import "@mantine/core/styles.layer.css"
@@ -33,6 +33,7 @@ import "@xyflow/react/dist/style.css"
 
 // Custom
 import "./styles/global.css"
+import { useFlowStore, type FlowNode } from "./stores/flow"
 
 const nodeTypes = {
   userMessage: UserMessageNode,
@@ -80,13 +81,17 @@ function Main() {
   )
 }
 
+const queryClient = new QueryClient()
+
 export function App() {
   return (
-    <ReactFlowProvider>
-      <MantineProvider>
-        <Main />
-        <Notifications position="bottom-center" />
-      </MantineProvider>
-    </ReactFlowProvider>
+    <QueryClientProvider client={queryClient}>
+      <ReactFlowProvider>
+        <MantineProvider>
+          <Main />
+          <Notifications position="bottom-center" />
+        </MantineProvider>
+      </ReactFlowProvider>
+    </QueryClientProvider>
   )
 }

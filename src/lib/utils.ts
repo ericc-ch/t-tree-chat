@@ -14,3 +14,7 @@ export const buildMessages = (
 
 export const sleep = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms))
+
+// Taken from https://github.com/unjs/ufo
+export const cleanDoubleSlashes = (input: string) =>
+  input.replaceAll(/\/{2,}/g, "/")

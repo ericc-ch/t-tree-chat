@@ -2,6 +2,16 @@ import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 
 import { App } from "./app.tsx"
+import { cleanDoubleSlashes } from "./lib/utils.ts"
+
+console.log(globalThis.location.pathname)
+
+if (
+  globalThis.location.pathname
+  === cleanDoubleSlashes(`${import.meta.env.BASE_URL}/oauth`)
+) {
+  globalThis.location.href = "/"
+}
 
 const root = document.querySelector("#root")
 if (!root) throw new Error("No root element found")

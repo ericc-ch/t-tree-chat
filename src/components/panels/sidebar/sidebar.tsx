@@ -1,6 +1,7 @@
 import { Icon } from "@iconify/react/dist/iconify.js"
 import {
   ActionIcon,
+  Avatar,
   Button,
   Divider,
   Group,
@@ -11,16 +12,58 @@ import {
   Title,
 } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
+import { useQuery } from "@tanstack/react-query"
 import { Panel } from "@xyflow/react"
-import { useState } from "react"
+import { OAuthProvider } from "appwrite"
+import { useState, type FormEvent, type FormEventHandler } from "react"
 
+import { getUser } from "~/src/api/get-user"
+import { useSignOut } from "~/src/api/sign-out"
+import { account } from "~/src/lib/appwrite"
 import { useSettingsStore } from "~/src/stores/settings"
 
 import classes from "./sidebar.module.css"
 
+const onGithubSignIn = () => {
+  account.createOAuth2Session(
+    OAuthProvider.Github,
+    import.meta.env.VITE_AUTH_REDIRECT_SUCCESS,
+    import.meta.env.VITE_AUTH_REDIRECT_ERROR,
+  )
+}
+
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false)
   const setAPIKeys = useSettingsStore((store) => store.setAPIKeys)
+
+  const onOpen = () => {
+    setIsOpen(true)
+  }
+  const onClose = () => {
+    setIsOpen(false)
+  }
+
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    const data = new FormData(event.currentTarget)
+    const openRouterAPIKey = data.get("openrouter") as string
+    const googleAPIKey = data.get("google") as string
+
+    setAPIKeys({ openRouterAPIKey, googleAPIKey })
+
+    notifications.show({
+      withBorder: true,
+      message: "API keys saved!",
+    })
+  }
+
+  const userQuery = useQuery(getUser)
+  const signOut = useSignOut()
+
+  const onSignOut = () => {
+    signOut.mutate()
+  }
 
   if (!isOpen) {
     return (
@@ -31,9 +74,7 @@ export function Sidebar() {
           size="lg"
           title="Open sidebar"
           variant="outline"
-          onClick={() => {
-            setIsOpen(true)
-          }}
+          onClick={onOpen}
         >
           <Icon icon="mingcute:align-arrow-right-fill" />
         </ActionIcon>
@@ -50,9 +91,7 @@ export function Sidebar() {
               aria-label="Close sidebar"
               title="Close sidebar"
               variant="outline"
-              onClick={() => {
-                setIsOpen(false)
-              }}
+              onClick={onClose}
             >
               <Icon icon="mingcute:close-fill" />
             </ActionIcon>
@@ -61,22 +100,7 @@ export function Sidebar() {
           <Stack
             component="form"
             gap="md"
-            onSubmit={(e) => {
-              e.preventDefault()
-
-              const data = new FormData(
-                e.currentTarget as unknown as HTMLFormElement,
-              )
-              const openRouterAPIKey = data.get("openrouter") as string
-              const googleAPIKey = data.get("google") as string
-
-              setAPIKeys({ openRouterAPIKey, googleAPIKey })
-
-              notifications.show({
-                withBorder: true,
-                message: "API keys saved!",
-              })
-            }}
+            onSubmit={onSubmit as unknown as FormEventHandler<HTMLDivElement>}
           >
             <Title order={3}>API Keys</Title>
 
@@ -115,15 +139,36 @@ export function Sidebar() {
               </Text>
             </div>
 
-            <Stack gap="xs">
-              <Button
-                leftSection={<Icon icon="mingcute:github-fill" />}
-                type="submit"
-                variant="outline"
-              >
-                Sign in with GitHub
-              </Button>
-            </Stack>
+            {userQuery.data ?
+              <>
+                <Group>
+                  <Avatar color="initials" name={userQuery.data.name} />
+                  <Text>{userQuery.data.name}</Text>
+                </Group>
+
+                <Button
+                  color="red"
+                  leftSection={<Icon icon="mingcute:exit-fill" />}
+                  loading={signOut.isPending}
+                  type="submit"
+                  variant="outline"
+                  onClick={onSignOut}
+                >
+                  Sign out
+                </Button>
+              </>
+            : <Stack gap="xs">
+                {/* TODO: Add more sign in options */}
+                <Button
+                  leftSection={<Icon icon="mingcute:github-fill" />}
+                  type="submit"
+                  variant="outline"
+                  onClick={onGithubSignIn}
+                >
+                  Sign in with GitHub
+                </Button>
+              </Stack>
+            }
           </Stack>
         </Stack>
       </Paper>
