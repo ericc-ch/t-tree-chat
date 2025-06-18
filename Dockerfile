@@ -1,6 +1,9 @@
 FROM oven/bun:alpine AS builder
 WORKDIR /app
 
+ARG VITE_POCKETBASE_BASE_URL                                                                                                                              
+ENV VITE_POCKETBASE_BASE_URL=$VITE_POCKETBASE_BASE_URL
+
 COPY ./package.json ./bun.lock ./
 RUN bun install --frozen-lockfile
 
