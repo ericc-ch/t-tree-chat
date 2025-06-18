@@ -1,12 +1,16 @@
+# See README.md for self-hosting instructions.
+# Change this to a unique name for your application.
 app = 't-tree-chat'
 primary_region = 'iad'
 
 
 [build]
 [build.args]
+# Update this to your application's URL on Fly.io.
 VITE_POCKETBASE_BASE_URL = "https://t-tree-chat.fly.dev"
 
 [[mounts]]
+# This should match the name of the volume you create on Fly.io.
 source = 't_tree_chat'
 destination = '/app/pb_data'
 

@@ -2,7 +2,7 @@
   "name": "t-tree-chat",
   "version": "0.0.0",
   "private": true,
-  "description": "t3 but it's a tree. cloneathon submission.",
+  "description": "T-Tree chat, because conversation is basically a tree graph.",
   "author": "Erick Christian <erickchristian48@gmail.com>",
   "type": "module",
   "scripts": {
