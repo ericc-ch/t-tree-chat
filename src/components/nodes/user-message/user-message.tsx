@@ -20,7 +20,7 @@ import {
   useUpdateNodeInternals,
   type NodeProps,
 } from "@xyflow/react"
-import { streamText, type CoreMessage } from "ai"
+import { APICallError, streamText, type CoreMessage } from "ai"
 import clsx from "clsx"
 import { useState, type FormEvent } from "react"
 import invariant from "tiny-invariant"
@@ -103,6 +103,13 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
       const response = streamText({
         ...options,
         messages,
+        onError: (error: unknown) => {
+          if ((error as { error?: Error }).error) {
+            throw (error as { error: Error }).error
+          }
+
+          throw error as Error
+        },
       })
 
       for await (const part of response.fullStream) {
@@ -129,6 +136,20 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
       }
     } catch (error) {
       console.error(error)
+
+      if (error instanceof APICallError) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const response = JSON.parse(error.responseBody ?? "{}")
+
+        return notifications.show({
+          title: error.name,
+          // Im going insane
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          message: response.error.message,
+          color: "red",
+        })
+      }
+
       notifications.show({
         message: (error as Error).message,
         color: "red",
