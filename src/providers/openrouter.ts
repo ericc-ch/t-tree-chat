@@ -77,6 +77,12 @@ export const OPENROUTER_MODELS: Array<{
     value: "meta-llama/llama-4-scout:free",
     label: "Llama 4 Scout (free)",
   },
+
+  // Mistral
+  {
+    value: "mistralai/mistral-nemo:free",
+    label: "Mistral Nemo (free)",
+  },
 ]
 
 export const OPENROUTER_MODEL_CAPABILITIES = new Map<
@@ -167,6 +173,17 @@ export const OPENROUTER_MODEL_CAPABILITIES = new Map<
       temperature: true,
       thinkingMode: false,
       attachments: { image: true, pdf: false },
+    },
+  ],
+
+  // Mistral
+  [
+    "mistralai/mistral-nemo:free",
+    {
+      systemPrompt: true,
+      temperature: true,
+      thinkingMode: false,
+      attachments: false,
     },
   ],
 ])
@@ -265,6 +282,18 @@ export const OPENROUTER_MODEL_OPTIONS_MAPPER: Map<
     (config) => {
       return {
         model: getOpenRouterModel("meta-llama/llama-4-scout:free"),
+        system: config.systemPrompt,
+        temperature: config.temperature,
+      }
+    },
+  ],
+
+  // Mistral
+  [
+    "mistralai/mistral-nemo:free",
+    (config) => {
+      return {
+        model: getOpenRouterModel("mistralai/mistral-nemo:free"),
         system: config.systemPrompt,
         temperature: config.temperature,
       }
