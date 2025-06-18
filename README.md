@@ -1,4 +1,4 @@
-# T🌳 Chat: Your AI Conversation Tree
+# T-Tree 🌳 Chat: Your AI Conversation Tree
 
 T-Tree chat, because conversation is basically a tree graph.
 
