@@ -24,7 +24,7 @@ createRoot(root).render(
 const save = async (event: KeyboardEvent) => {
   if ((event.ctrlKey || event.metaKey) && event.key === "s") {
     event.preventDefault()
-    await syncConversation()
+    await syncConversation({ pull: false })
   }
 }
 

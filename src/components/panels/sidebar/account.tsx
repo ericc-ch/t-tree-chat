@@ -17,7 +17,7 @@ export function Account() {
 
   useEffect(() => {
     if (!userQuery.isSuccess) return
-    sync.mutate()
+    sync.mutate({ pull: true })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sync.mutate, userQuery.isSuccess])
 

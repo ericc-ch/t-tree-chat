@@ -12,13 +12,17 @@ import { useFlowStore } from "../stores/flow"
 import { useUIStore } from "../stores/ui"
 import { getUser } from "./get-user"
 
+interface SyncOptions {
+  pull?: boolean
+}
+
 export const useSync = () => {
   const userQuery = useQuery(getUser)
   const setSyncing = useUIStore((store) => store.setSyncing)
   const exportJSON = useFlowStore((state) => state.exportJSON)
   const importJSON = useFlowStore((state) => state.importJSON)
 
-  const mutationFn = async () => {
+  const mutationFn = async (options?: SyncOptions) => {
     setSyncing(true)
 
     try {
@@ -32,39 +36,45 @@ export const useSync = () => {
           flow: compressed,
         })
 
-        return await pb.collection("flows").create(formData)
+        return pb.collection("flows").create(formData)
       }
 
-      const flowJSON = exportJSON()
-
-      const remoteFlow = await pb
-        .collection("flows")
-        .getFirstListItem(`user = "${user.id}"`)
-        .catch((error: unknown) => {
-          if (error instanceof ClientResponseError && error.status === 404) {
-            return createFlow(flowJSON)
-          }
-
-          throw error
-        })
-
-      const fileUrl = pb.files.getURL(remoteFlow, remoteFlow.flow as string)
-      const response = await ofetch(fileUrl, { responseType: "blob" })
-
-      const json = await decompress(new File([response], "flow.gz"))
-      const merged = importJSON(json)
-
-      const updateFlow = async () => {
-        const compressed = await compress(merged, "flow.gz")
+      const updateFlow = async (id: string, json: string) => {
+        const compressed = await compress(json, "flow.gz")
         const formData = objToFormData({
           user: user.id,
           flow: compressed,
         })
 
-        return await pb.collection("flows").update(remoteFlow.id, formData)
+        return pb.collection("flows").update(id, formData)
       }
 
-      return await updateFlow()
+      let remoteFlow
+      try {
+        remoteFlow = await pb
+          .collection("flows")
+          .getFirstListItem(`user = "${user.id}"`)
+      } catch (error) {
+        if (error instanceof ClientResponseError && error.status === 404) {
+          // Not found, create it
+          const flowJSON = exportJSON()
+          return await createFlow(flowJSON)
+        }
+        throw error // Other errors
+      }
+
+      // If we are here, remoteFlow exists.
+      if (options?.pull) {
+        const fileUrl = pb.files.getURL(remoteFlow, remoteFlow.flow as string)
+        const response = await ofetch(fileUrl, { responseType: "blob" })
+        const json = await decompress(new File([response], "flow.gz"))
+        const merged = importJSON(json)
+        return await updateFlow(remoteFlow.id, merged)
+      } else {
+        // Just upload
+        const flowJSON = exportJSON()
+        return await updateFlow(remoteFlow.id, flowJSON)
+      }
     } finally {
       setSyncing(false)
     }
@@ -76,7 +86,7 @@ export const useSync = () => {
 }
 
 // Non hook version
-export const syncConversation = async () => {
+export const syncConversation = async (options?: SyncOptions) => {
   const { setSyncing } = useUIStore.getState()
   const { exportJSON, importJSON } = useFlowStore.getState()
 
@@ -93,39 +103,45 @@ export const syncConversation = async () => {
         flow: compressed,
       })
 
-      return await pb.collection("flows").create(formData)
+      return pb.collection("flows").create(formData)
     }
 
-    const flowJSON = exportJSON()
-
-    const remoteFlow = await pb
-      .collection("flows")
-      .getFirstListItem(`user = "${user.id}"`)
-      .catch((error: unknown) => {
-        if (error instanceof ClientResponseError && error.status === 404) {
-          return createFlow(flowJSON)
-        }
-
-        throw error
-      })
-
-    const fileUrl = pb.files.getURL(remoteFlow, remoteFlow.flow as string)
-    const response = await ofetch(fileUrl, { responseType: "blob" })
-
-    const json = await decompress(new File([response], "flow.gz"))
-    const merged = importJSON(json)
-
-    const updateFlow = async () => {
-      const compressed = await compress(merged, "flow.gz")
+    const updateFlow = async (id: string, json: string) => {
+      const compressed = await compress(json, "flow.gz")
       const formData = objToFormData({
         user: user.id,
         flow: compressed,
       })
 
-      return await pb.collection("flows").update(remoteFlow.id, formData)
+      return pb.collection("flows").update(id, formData)
     }
 
-    return await updateFlow()
+    let remoteFlow
+    try {
+      remoteFlow = await pb
+        .collection("flows")
+        .getFirstListItem(`user = "${user.id}"`)
+    } catch (error) {
+      if (error instanceof ClientResponseError && error.status === 404) {
+        // Not found, create it
+        const flowJSON = exportJSON()
+        return await createFlow(flowJSON)
+      }
+      throw error // Other errors
+    }
+
+    // If we are here, remoteFlow exists.
+    if (options?.pull) {
+      const fileUrl = pb.files.getURL(remoteFlow, remoteFlow.flow as string)
+      const response = await ofetch(fileUrl, { responseType: "blob" })
+      const json = await decompress(new File([response], "flow.gz"))
+      const merged = importJSON(json)
+      return await updateFlow(remoteFlow.id, merged)
+    } else {
+      // Just upload
+      const flowJSON = exportJSON()
+      return await updateFlow(remoteFlow.id, flowJSON)
+    }
   } finally {
     setSyncing(false)
   }

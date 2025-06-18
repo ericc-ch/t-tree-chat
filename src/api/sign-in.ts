@@ -14,7 +14,7 @@ export const useSignIn = () => {
     },
     onSuccess: (data) => {
       queryClient.setQueryData(getUser.queryKey, data.record)
-      sync.mutate()
+      sync.mutate({ pull: false })
     },
   })
 }
