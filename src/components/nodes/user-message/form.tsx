@@ -225,6 +225,7 @@ export function Form(props: NodeProps<UserMessageNode>) {
 
           <ActionIcon
             aria-label="Delete node"
+            className="nodrag"
             color="red"
             ml="auto"
             title="Delete node"
@@ -278,6 +279,7 @@ export function Form(props: NodeProps<UserMessageNode>) {
 
             <ActionIcon
               aria-label="Generate response"
+              className="nodrag"
               size="input-sm"
               title="Generate response"
               type="submit"
@@ -293,6 +295,7 @@ export function Form(props: NodeProps<UserMessageNode>) {
           <Group gap="xs" justify="end">
             <ActionIcon
               aria-label="More options"
+              className="nodrag"
               title="More options"
               variant={opened ? "filled" : "outline"}
               onClick={toggle}

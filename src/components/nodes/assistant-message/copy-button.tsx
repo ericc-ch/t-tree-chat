@@ -32,6 +32,7 @@ export function CopyButton({ message, ...props }: CopyButtonProps) {
       <ActionIcon
         {...props}
         aria-label="Copy message"
+        className="nodrag"
         title="Copy message"
         variant="outline"
         onClick={copy}

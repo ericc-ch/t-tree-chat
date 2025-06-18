@@ -25,6 +25,7 @@ export function ReplyButton({ nodeId, ...props }: ReplyButtonProps) {
     <ActionIcon
       {...props}
       aria-label="Reply message"
+      className="nodrag"
       title="Reply message"
       variant="outline"
       onClick={onClick}

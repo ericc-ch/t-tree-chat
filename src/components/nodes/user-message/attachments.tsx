@@ -152,6 +152,7 @@ export function Attachments(props: AttachmentsProps) {
 
           <ActionIcon
             aria-label="Delete node"
+            className="nodrag"
             color="red"
             disabled={!file.uploaded}
             ml="auto"

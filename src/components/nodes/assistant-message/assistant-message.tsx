@@ -51,6 +51,7 @@ export function AssistantMessageNode(props: NodeProps<AssistantMessageNode>) {
 
             <ActionIcon
               aria-label="Delete node"
+              className="nodrag"
               color="red"
               disabled={props.data.isLoading}
               ml="auto"

@@ -16,7 +16,6 @@ export function Sidebar() {
     <>
       <ActionIcon
         aria-label="Open sidebar"
-        className={classes.toggleSidebar}
         display={isSidebarOpen ? "none" : "block"}
         size="lg"
         title="Open sidebar"
