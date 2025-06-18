@@ -41,8 +41,20 @@ export const OPENROUTER_MODELS: Array<{
     label: "Qwen QwQ 32B (free)",
   },
   {
+    value: "qwen/qwen2.5-vl-32b-instruct:free",
+    label: "Qwen 2.5 VL 32B (free)",
+  },
+  {
+    value: "qwen/qwen-2.5-coder-32b-instruct:free",
+    label: "Qwen 2.5 Coder 32B (free)",
+  },
+  {
     value: "deepseek/deepseek-r1:free",
     label: "DeepSeek R1 (free)",
+  },
+  {
+    value: "deepseek/deepseek-r1-0528-qwen3-8b:free",
+    label: "DeepSeek R1 0528 Qwen3 8B (free)",
   },
   {
     value: "meta-llama/llama-4-scout:free",
@@ -64,7 +76,34 @@ export const OPENROUTER_MODEL_CAPABILITIES = new Map<
     },
   ],
   [
+    "qwen/qwen2.5-vl-32b-instruct:free",
+    {
+      systemPrompt: true,
+      temperature: true,
+      thinkingMode: false,
+      attachments: { image: true, pdf: false },
+    },
+  ],
+  [
+    "qwen/qwen-2.5-coder-32b-instruct:free",
+    {
+      systemPrompt: true,
+      temperature: true,
+      thinkingMode: false,
+      attachments: false,
+    },
+  ],
+  [
     "deepseek/deepseek-r1:free",
+    {
+      systemPrompt: true,
+      temperature: true,
+      thinkingMode: false,
+      attachments: false,
+    },
+  ],
+  [
+    "deepseek/deepseek-r1-0528-qwen3-8b:free",
     {
       systemPrompt: true,
       temperature: true,
@@ -98,10 +137,40 @@ export const OPENROUTER_MODEL_OPTIONS_MAPPER: Map<
     },
   ],
   [
+    "qwen/qwen-2.5-coder-32b-instruct:free",
+    (config) => {
+      return {
+        model: getOpenRouterModel("qwen/qwq-32b:free"),
+        system: config.systemPrompt,
+        temperature: config.temperature,
+      }
+    },
+  ],
+  [
+    "qwen/qwen2.5-vl-32b-instruct:free",
+    (config) => {
+      return {
+        model: getOpenRouterModel("qwen/qwen2.5-vl-32b-instruct:free"),
+        system: config.systemPrompt,
+        temperature: config.temperature,
+      }
+    },
+  ],
+  [
     "deepseek/deepseek-r1:free",
     (config) => {
       return {
         model: getOpenRouterModel("deepseek/deepseek-r1:free"),
+        system: config.systemPrompt,
+        temperature: config.temperature,
+      }
+    },
+  ],
+  [
+    "deepseek/deepseek-r1-0528-qwen3-8b:free",
+    (config) => {
+      return {
+        model: getOpenRouterModel("deepseek/deepseek-r1-0528-qwen3-8b:free"),
         system: config.systemPrompt,
         temperature: config.temperature,
       }

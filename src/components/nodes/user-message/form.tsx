@@ -12,7 +12,7 @@ import {
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import { useUpdateNodeInternals, type NodeProps } from "@xyflow/react"
-import { APICallError, streamText, type CoreMessage } from "ai"
+import { APICallError, RetryError, streamText, type CoreMessage } from "ai"
 import clsx from "clsx"
 import { useState, type FormEvent } from "react"
 import invariant from "tiny-invariant"
@@ -50,6 +50,7 @@ export function Form(props: NodeProps<UserMessageNode>) {
     props.data.config.model,
   )
 
+  // eslint-disable-next-line complexity
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
@@ -127,6 +128,7 @@ export function Form(props: NodeProps<UserMessageNode>) {
         ...options,
         messages,
         onError: (error: unknown) => {
+          console.error(JSON.stringify(error))
           if ((error as { error?: Error }).error) {
             throw (error as { error: Error }).error
           }
@@ -174,6 +176,16 @@ export function Form(props: NodeProps<UserMessageNode>) {
       }
     } catch (error) {
       console.error(error)
+
+      if (error instanceof RetryError) {
+        return notifications.show({
+          title: error.name,
+          // Im going insane
+
+          message: (error.lastError as Error).name,
+          color: "red",
+        })
+      }
 
       if (error instanceof APICallError) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
