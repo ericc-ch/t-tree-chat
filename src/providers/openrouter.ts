@@ -70,6 +70,10 @@ export const OPENROUTER_MODELS: Array<{
 
   // Llama
   {
+    value: "meta-llama/llama-4-maverick:free",
+    label: "Llama 4 Maverick (free)",
+  },
+  {
     value: "meta-llama/llama-4-scout:free",
     label: "Llama 4 Scout (free)",
   },
@@ -147,6 +151,15 @@ export const OPENROUTER_MODEL_CAPABILITIES = new Map<
   ],
 
   // Llama
+  [
+    "meta-llama/llama-4-maverick:free",
+    {
+      systemPrompt: true,
+      temperature: true,
+      thinkingMode: false,
+      attachments: { image: true, pdf: false },
+    },
+  ],
   [
     "meta-llama/llama-4-scout:free",
     {
@@ -237,6 +250,16 @@ export const OPENROUTER_MODEL_OPTIONS_MAPPER: Map<
   ],
 
   // Llama
+  [
+    "meta-llama/llama-4-maverick:free",
+    (config) => {
+      return {
+        model: getOpenRouterModel("meta-llama/llama-4-maverick:free"),
+        system: config.systemPrompt,
+        temperature: config.temperature,
+      }
+    },
+  ],
   [
     "meta-llama/llama-4-scout:free",
     (config) => {
