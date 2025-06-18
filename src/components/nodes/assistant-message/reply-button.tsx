@@ -8,17 +8,17 @@ interface ReplyButtonProps extends ActionIconProps {
   nodeId: string
 }
 
-export function ReplyButton(props: ReplyButtonProps) {
+export function ReplyButton({ nodeId, ...props }: ReplyButtonProps) {
   const updateNodeInternals = useUpdateNodeInternals()
   const createUserNode = useFlowStore((state) => state.createUserNode)
 
   const onClick = () => {
-    createUserNode({ parentId: props.nodeId })
+    createUserNode({ parentId: nodeId })
 
     // Call this to notify that we updated the state of the handler
     // because bottom handler only appears after we added a child
     // https://reactflow.dev/learn/troubleshooting#couldnt-create-edge-for-sourcetarget-handle-id-some-id-edge-id-some-id
-    updateNodeInternals(props.nodeId)
+    updateNodeInternals(nodeId)
   }
 
   return (

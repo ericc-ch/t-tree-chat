@@ -1,4 +1,4 @@
-import type { CoreMessage, CoreUserMessage } from "ai"
+import type { CoreAssistantMessage, CoreMessage, CoreUserMessage } from "ai"
 
 import type { FlowNode } from "../stores/flow"
 
@@ -46,14 +46,23 @@ export const buildMessages = (
       return buildUserMessage(node, { withAttachments })
     }
 
+    const content: CoreAssistantMessage["content"] = []
+
+    if (node.data.reasoning) {
+      content.push({
+        type: "reasoning",
+        text: node.data.reasoning,
+      })
+    }
+
+    content.push({
+      type: "text",
+      text: node.data.message,
+    })
+
     return {
       role: "assistant",
-      content: [
-        {
-          type: "text",
-          text: node.data.message,
-        },
-      ],
+      content,
     }
   })
 

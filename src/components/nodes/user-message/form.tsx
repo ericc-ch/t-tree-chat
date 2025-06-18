@@ -168,7 +168,6 @@ export function Form(props: NodeProps<UserMessageNode>) {
             break
           }
           default: {
-            console.log(part)
             break
           }
         }

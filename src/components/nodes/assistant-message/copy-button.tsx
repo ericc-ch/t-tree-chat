@@ -9,12 +9,12 @@ interface CopyButtonProps extends ActionIconProps {
   message: string
 }
 
-export function CopyButton(props: CopyButtonProps) {
+export function CopyButton({ message, ...props }: CopyButtonProps) {
   const [showTooltip, setShowTooltip] = useState(false)
 
   const copy = async () => {
     try {
-      await navigator.clipboard.writeText(props.message)
+      await navigator.clipboard.writeText(message)
       setShowTooltip(true)
       await sleep(2000)
       setShowTooltip(false)
