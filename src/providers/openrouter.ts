@@ -42,6 +42,10 @@ export const OPENROUTER_MODELS: Array<{
     label: "Qwen QwQ 32B (free)",
   },
   {
+    value: "qwen/qwen3-32b:free",
+    label: "Qwen 3 32B (free)",
+  },
+  {
     value: "qwen/qwen-2.5-coder-32b-instruct:free",
     label: "Qwen 2.5 Coder 32B (free)",
   },
@@ -92,6 +96,15 @@ export const OPENROUTER_MODEL_CAPABILITIES = new Map<
   // Qwen
   [
     "qwen/qwq-32b:free",
+    {
+      systemPrompt: true,
+      temperature: true,
+      thinkingMode: false,
+      attachments: false,
+    },
+  ],
+  [
+    "qwen/qwen3-32b:free",
     {
       systemPrompt: true,
       temperature: true,
@@ -198,6 +211,16 @@ export const OPENROUTER_MODEL_OPTIONS_MAPPER: Map<
     (config) => {
       return {
         model: getOpenRouterModel("qwen/qwq-32b:free"),
+        system: config.systemPrompt,
+        temperature: config.temperature,
+      }
+    },
+  ],
+  [
+    "qwen/qwen3-32b:free",
+    (config) => {
+      return {
+        model: getOpenRouterModel("qwen/qwen3-32b:free"),
         system: config.systemPrompt,
         temperature: config.temperature,
       }
