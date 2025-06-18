@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react"
 
-import { Table, TypographyStylesProvider } from "@mantine/core"
+import { Box, Stack, Table, TypographyStylesProvider } from "@mantine/core"
 import clsx from "clsx"
 import Markdown from "markdown-to-jsx"
 
@@ -23,7 +23,8 @@ const markdownOptions: ComponentProps<typeof Markdown>["options"] = {
 }
 
 interface MarkdownRendererProps {
-  markdown: string
+  reasoning: string
+  message: string
 }
 
 export function MarkdownRenderer(props: MarkdownRendererProps) {
@@ -31,7 +32,18 @@ export function MarkdownRenderer(props: MarkdownRendererProps) {
     <div className={clsx("nowheel", classes.markdownRenderer)}>
       {/* https://reactflow.dev/api-reference/react-flow#nowheelclassname */}
       <TypographyStylesProvider>
-        <Markdown options={markdownOptions}>{props.markdown}</Markdown>
+        <Stack>
+          {props.reasoning && (
+            <Box
+              bg="gray.1"
+              p="xs"
+              style={{ borderRadius: "var(--mantine-radius-default)" }}
+            >
+              <Markdown options={markdownOptions}>{props.reasoning}</Markdown>
+            </Box>
+          )}
+          <Markdown options={markdownOptions}>{props.message}</Markdown>
+        </Stack>
       </TypographyStylesProvider>
     </div>
   )

@@ -1,10 +1,10 @@
 import { Icon } from "@iconify/react"
-import { ActionIcon } from "@mantine/core"
+import { ActionIcon, type ActionIconProps } from "@mantine/core"
 import { useUpdateNodeInternals } from "@xyflow/react"
 
 import { useFlowStore } from "~/src/stores/flow"
 
-interface ReplyButtonProps {
+interface ReplyButtonProps extends ActionIconProps {
   nodeId: string
 }
 
@@ -23,6 +23,7 @@ export function ReplyButton(props: ReplyButtonProps) {
 
   return (
     <ActionIcon
+      {...props}
       aria-label="Reply message"
       title="Reply message"
       variant="outline"

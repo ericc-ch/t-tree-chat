@@ -1,11 +1,11 @@
 import { Icon } from "@iconify/react"
-import { ActionIcon, Tooltip } from "@mantine/core"
+import { ActionIcon, Tooltip, type ActionIconProps } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
 import { useState } from "react"
 
 import { sleep } from "~/src/lib/utils"
 
-interface CopyButtonProps {
+interface CopyButtonProps extends ActionIconProps {
   message: string
 }
 
@@ -30,6 +30,7 @@ export function CopyButton(props: CopyButtonProps) {
   return (
     <Tooltip label="Copied!" opened={showTooltip}>
       <ActionIcon
+        {...props}
         aria-label="Copy message"
         title="Copy message"
         variant="outline"

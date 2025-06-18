@@ -148,7 +148,23 @@ export function Form(props: NodeProps<UserMessageNode>) {
             break
           }
           case "reasoning": {
-            console.log(part.textDelta)
+            updateNode({
+              nodeId: childId,
+              updater: (data) => ({
+                ...data,
+                reasoning: data.reasoning + part.textDelta,
+              }),
+            })
+            break
+          }
+          case "finish": {
+            updateNode({
+              nodeId: childId,
+              updater: (data) => ({
+                ...data,
+                isLoading: false,
+              }),
+            })
             break
           }
           default: {

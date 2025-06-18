@@ -52,6 +52,7 @@ export function AssistantMessageNode(props: NodeProps<AssistantMessageNode>) {
             <ActionIcon
               aria-label="Delete node"
               color="red"
+              disabled={props.data.isLoading}
               ml="auto"
               title="Delete node"
               variant="outline"
@@ -64,14 +65,20 @@ export function AssistantMessageNode(props: NodeProps<AssistantMessageNode>) {
           <Divider />
 
           <Box my="sm">
-            <MarkdownRenderer markdown={props.data.message} />
+            <MarkdownRenderer
+              message={props.data.message}
+              reasoning={props.data.reasoning}
+            />
           </Box>
 
           <Divider />
 
           <Group gap="xs" justify="end">
-            <CopyButton message={props.data.message} />
-            <ReplyButton nodeId={props.id} />
+            <CopyButton
+              disabled={props.data.isLoading}
+              message={props.data.message}
+            />
+            <ReplyButton disabled={props.data.isLoading} nodeId={props.id} />
           </Group>
         </Stack>
       </Paper>

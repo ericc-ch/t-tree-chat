@@ -23,10 +23,14 @@ export interface Attachment {
 }
 
 interface MessageNodeData extends Record<string, unknown> {
+  isLoading: boolean
+
   config: GenerationConfig
 
   message: string
+  reasoning: string
   attachments: Array<Attachment>
+
   parentId?: string
   childrenIds: Array<string>
 }
@@ -89,10 +93,15 @@ export const useFlowStore = create<FlowState>((set, get) => ({
       type: "userMessage",
       position,
       data: {
+        isLoading: true,
+
         message: "",
+        reasoning: "",
         attachments: [],
+
         parentId: undefined,
         childrenIds: [],
+
         config: structuredClone(DEFAULT_GENERATION_CONFIG),
       },
     }
@@ -141,10 +150,15 @@ export const useFlowStore = create<FlowState>((set, get) => ({
         y: parentRect.y + parentRect.height + VERTICAL_PADDING,
       },
       data: {
+        isLoading: true,
+
         message: "",
+        reasoning: "",
         attachments: [],
+
         parentId,
         childrenIds: [],
+
         config: structuredClone(parentNode.data.config),
       },
     }
