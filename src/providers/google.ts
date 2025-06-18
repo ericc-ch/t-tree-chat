@@ -20,7 +20,7 @@ const getGoogleProvider = () => {
 }
 
 type GoogleProviderParams = Parameters<GoogleGenerativeAIProvider>
-type GoogleModelID = GoogleProviderParams[0] | "gemini-2.5-flash-preview-05-20"
+type GoogleModelID = GoogleProviderParams[0]
 type GoogleModelSettings = GoogleProviderParams[1]
 
 export const getGoogleModel = (
@@ -45,8 +45,12 @@ export const GOOGLE_MODELS: Array<{
   label: string
 }> = [
   {
-    value: "gemini-2.5-flash-preview-05-20",
-    label: "Gemini 2.5 Flash Preview 05-20",
+    value: "gemini-2.5-pro",
+    label: "Gemini 2.5 Pro",
+  },
+  {
+    value: "gemini-2.5-flash",
+    label: "Gemini 2.5 Flash",
   },
   {
     value: "gemini-2.0-flash",
@@ -63,7 +67,16 @@ export const GOOGLE_MODEL_CAPABILITIES = new Map<
   ModelCapabilities
 >([
   [
-    "gemini-2.5-flash-preview-05-20",
+    "gemini-2.5-pro",
+    {
+      systemPrompt: true,
+      temperature: true,
+      thinkingMode: true,
+      attachments: { image: true, pdf: true },
+    },
+  ],
+  [
+    "gemini-2.5-flash",
     {
       systemPrompt: true,
       temperature: true,
@@ -94,10 +107,31 @@ export const GOOGLE_MODEL_CAPABILITIES = new Map<
 export const GOOGLE_MODEL_OPTIONS_MAPPER: Map<GoogleModelID, OptionsMapper> =
   new Map([
     [
-      "gemini-2.5-flash-preview-05-20",
+      "gemini-2.5-pro",
       (config) => {
         return {
-          model: getGoogleModel("gemini-2.5-flash-preview-05-20"),
+          model: getGoogleModel("gemini-2.5-pro"),
+          system: config.systemPrompt,
+          temperature: config.temperature,
+          providerOptions: {
+            google: {
+              thinkingConfig: {
+                // TODO: Implement thinking budget
+                // 0 disables thinking mode btw
+                // https://ai-sdk.dev/providers/ai-sdk-providers/google-generative-ai#language-models
+                includeThoughts: config.thinkingMode,
+                thinkingBudget: config.thinkingMode ? null : 0,
+              },
+            } satisfies GoogleGenerativeAIProviderOptions,
+          },
+        }
+      },
+    ],
+    [
+      "gemini-2.5-flash",
+      (config) => {
+        return {
+          model: getGoogleModel("gemini-2.5-flash"),
           system: config.systemPrompt,
           temperature: config.temperature,
           providerOptions: {
