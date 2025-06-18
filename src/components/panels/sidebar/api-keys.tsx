@@ -38,16 +38,16 @@ export function APIKeys() {
 
       <Stack gap="xs">
         <PasswordInput
-          defaultValue={openRouterAPIKey}
-          label="OpenRouter API Key"
-          name="openRouter"
-          placeholder="sk-or-..."
-        />
-        <PasswordInput
           defaultValue={googleAPIKey}
           label="Gemini API Key"
           name="google"
           placeholder="AIzaSy..."
+        />
+        <PasswordInput
+          defaultValue={openRouterAPIKey}
+          label="OpenRouter API Key"
+          name="openRouter"
+          placeholder="sk-or-..."
         />
       </Stack>
 
