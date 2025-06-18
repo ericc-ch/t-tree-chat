@@ -192,6 +192,14 @@ export function Form(props: NodeProps<UserMessageNode>) {
         message: (error as Error).message,
         color: "red",
       })
+    } finally {
+      updateNode({
+        nodeId: childId,
+        updater: (data) => ({
+          ...data,
+          isLoading: false,
+        }),
+      })
     }
   }
 
