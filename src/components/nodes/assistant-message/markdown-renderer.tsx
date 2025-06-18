@@ -34,11 +34,7 @@ export function MarkdownRenderer(props: MarkdownRendererProps) {
       <TypographyStylesProvider>
         <Stack>
           {props.reasoning && (
-            <Box
-              bg="gray.1"
-              p="xs"
-              style={{ borderRadius: "var(--mantine-radius-default)" }}
-            >
+            <Box bg="gray.1" className={classes.thoughtsRenderer} p="xs">
               <Markdown options={markdownOptions}>{props.reasoning}</Markdown>
             </Box>
           )}

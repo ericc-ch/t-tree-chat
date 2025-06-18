@@ -19,6 +19,8 @@ import { useUpload } from "~/src/api/upload"
 import { GENERATION_CONFIG_KEY } from "~/src/lib/constants"
 import { pb } from "~/src/lib/pocketbase"
 
+import classes from "./user-message.module.css"
+
 const buildAcceptProp = (capabilities: AttachmentsCapabilities) => {
   const mimeTypes: Array<string> = []
 
@@ -129,16 +131,10 @@ export function Attachments(props: AttachmentsProps) {
       {files.map((file) => (
         <Group
           key={file.name}
+          className={classes.fileEntry}
           component={file.url ? "a" : "div"}
           // @ts-expect-error if url exists, it should be an anchor, if it's not, `href` gonna be undefined anyway
           href={file.url}
-          style={{
-            borderColor: "var(--mantine-color-gray-4)",
-            borderStyle: "solid",
-            borderWidth: "1px",
-            borderRadius: "var(--mantine-radius-default)",
-            padding: "var(--mantine-spacing-xs)",
-          }}
           target="_blank"
         >
           <ThemeIcon variant="light">

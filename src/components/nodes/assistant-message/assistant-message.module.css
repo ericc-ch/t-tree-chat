@@ -4,6 +4,10 @@
 
 /* Markdown Renderer */
 
+.thoughtsRenderer {
+  border-radius: var(--mantine-radius-default)
+}
+
 .markdownRenderer {
   overflow-y: auto;
   max-height: 540px;
@@ -13,3 +17,4 @@
   overflow-x: auto;
   max-width: 100%;
 }
+
