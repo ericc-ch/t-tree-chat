@@ -55,7 +55,7 @@ export function Attachments(props: AttachmentsProps) {
     })),
   )
 
-  const onDrop = (newFiles: Array<File>) => {
+  const onDrop = async (newFiles: Array<File>) => {
     const unique = newFiles.filter((newFile) => {
       return !files.some((oldFile) => oldFile.name === newFile.name)
     })
@@ -75,36 +75,34 @@ export function Attachments(props: AttachmentsProps) {
       // `file` should not be undefined since these are the uploaded ones
       invariant(file.file, "File should not be undefined")
 
-      upload.mutate(file.file, {
-        onSuccess: (data) => {
-          const fileUrl = pb.files.getURL(data, data.upload as string)
+      try {
+        const result = await upload.mutateAsync(file.file)
+        const fileUrl = pb.files.getURL(result, result.upload as string)
 
-          setFiles((oldFiles) =>
-            oldFiles.map((oldFile) => {
-              if (oldFile.name === file.name) {
-                return {
-                  ...oldFile,
-                  uploaded: true,
-                  url: fileUrl,
-                }
+        setFiles((oldFiles) =>
+          oldFiles.map((oldFile) => {
+            if (oldFile.name === file.name) {
+              return {
+                ...oldFile,
+                uploaded: true,
+                url: fileUrl,
               }
+            }
 
-              return oldFile
-            }),
-          )
-        },
-        onError: () => {
-          setFiles((oldFiles) =>
-            oldFiles.filter((oldFile) => oldFile.name !== file.name),
-          )
+            return oldFile
+          }),
+        )
+      } catch (error) {
+        setFiles((oldFiles) =>
+          oldFiles.filter((oldFile) => oldFile.name !== file.name),
+        )
 
-          notifications.show({
-            message: `Failed to upload ${file.name}`,
-            color: "red",
-            withBorder: true,
-          })
-        },
-      })
+        notifications.show({
+          message: `Failed to upload ${file.name}: ${(error as Error).message}`,
+          color: "red",
+          withBorder: true,
+        })
+      }
     }
   }
 

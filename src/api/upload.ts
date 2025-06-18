@@ -4,6 +4,8 @@ import { pb } from "../lib/pocketbase"
 import { objToFormData } from "../lib/utils"
 import { getUser } from "./get-user"
 
+const UPLOAD_TIMEOUT = 10_000
+
 export const useUpload = () => {
   const userQuery = useQuery(getUser)
 
@@ -17,7 +19,15 @@ export const useUpload = () => {
         upload: file,
       })
 
-      return await pb.collection("uploads").create(formData)
+      const uploadPromise = pb.collection("uploads").create(formData)
+
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          reject(new Error("Upload timed out"))
+        }, UPLOAD_TIMEOUT)
+      })
+
+      return Promise.race([uploadPromise, timeoutPromise])
     },
   })
 }
