@@ -1,5 +1,10 @@
-app = 'starter-pocketbase'
-primary_region = 'sin'
+# fly.toml app configuration file generated for t-tree-chat on 2025-06-18T18:16:15+07:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 't-tree-chat'
+primary_region = 'iad'
 
 [build]
 

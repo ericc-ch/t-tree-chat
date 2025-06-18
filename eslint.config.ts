@@ -23,7 +23,6 @@ export default config(
     },
   },
   {
-    // @ts-expect-error because its 2AM and I don't care
     extends: [...pluginQuery.configs["flat/recommended"]],
   },
 )

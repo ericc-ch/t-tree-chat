@@ -1,0 +1,17 @@
+.vscode
+node_modules
+LICENSE
+README.md
+
+# Git
+.git
+.gitignore
+
+# Pocketbase
+pocketbase-bin
+pb_data
+pb_public
+pb_migrations
+
+# Aider
+.aider*
