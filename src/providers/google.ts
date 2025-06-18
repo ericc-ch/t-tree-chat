@@ -53,6 +53,10 @@ export const GOOGLE_MODELS: Array<{
     label: "Gemini 2.5 Flash",
   },
   {
+    value: "gemini-2.5-flash-lite-preview-06-17",
+    label: "Gemini 2.5 Flash Lite (Preview)",
+  },
+  {
     value: "gemini-2.0-flash",
     label: "Gemini 2.0 Flash",
   },
