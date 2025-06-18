@@ -37,6 +37,10 @@ export const OPENROUTER_MODELS: Array<{
   label: string
 }> = [
   {
+    value: "qwen/qwq-32b:free",
+    label: "Qwen QwQ 32B (free)",
+  },
+  {
     value: "deepseek/deepseek-r1:free",
     label: "DeepSeek R1 (free)",
   },
@@ -50,6 +54,15 @@ export const OPENROUTER_MODEL_CAPABILITIES = new Map<
   OpenRouterModelID,
   ModelCapabilities
 >([
+  [
+    "qwen/qwq-32b:free",
+    {
+      systemPrompt: true,
+      temperature: true,
+      thinkingMode: false,
+      attachments: false,
+    },
+  ],
   [
     "deepseek/deepseek-r1:free",
     {
@@ -74,6 +87,16 @@ export const OPENROUTER_MODEL_OPTIONS_MAPPER: Map<
   OpenRouterModelID,
   OptionsMapper
 > = new Map([
+  [
+    "qwen/qwq-32b:free",
+    (config) => {
+      return {
+        model: getOpenRouterModel("qwen/qwq-32b:free"),
+        system: config.systemPrompt,
+        temperature: config.temperature,
+      }
+    },
+  ],
   [
     "deepseek/deepseek-r1:free",
     (config) => {
