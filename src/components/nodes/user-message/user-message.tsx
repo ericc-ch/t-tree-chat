@@ -103,7 +103,7 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
 
     if (props.data.parentId) {
       // If it has a parent, we build the chat history first
-      const ancestors = getAncestors(props.data.parentId)
+      const ancestors = getAncestors(props.id)
       messages = buildMessages(ancestors, {
         withAttachments: Boolean(capabilities.attachments),
       })

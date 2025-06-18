@@ -59,12 +59,11 @@ function Main() {
       <div className={classes.flowContainer}>
         <ReactFlow
           zoomOnDoubleClick
+          deleteKeyCode={null}
           edges={edges}
           nodeOrigin={NODE_ORIGIN}
           nodes={nodes}
           nodeTypes={nodeTypes}
-          panOnDrag={false}
-          panOnScroll={true}
           selectionMode={SelectionMode.Partial}
           onContextMenu={onContextMenu}
           onNodesChange={onNodesChange}

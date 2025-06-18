@@ -10,6 +10,8 @@ export const getUser = queryOptions({
 
     return user
   },
+  // 1 Hour
+  staleTime: 60 * 60 * 1000,
 })
 
 export class AuthError extends Error {
