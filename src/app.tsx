@@ -51,7 +51,6 @@ function Main() {
   const onNodesChange = useFlowStore((state) => state.onNodesChange)
 
   const onContextMenu = (event: MouseEvent<HTMLDivElement>) => {
-    event.preventDefault()
     menuClickListener({ event, instance })
   }
 

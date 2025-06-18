@@ -1,5 +1,4 @@
 import type { ReactFlowInstance } from "@xyflow/react"
-import type React from "react"
 import type { MouseEvent } from "react"
 
 import { Icon } from "@iconify/react"
@@ -60,6 +59,11 @@ interface menuClickListenerOptions {
 }
 
 export function menuClickListener(options: menuClickListenerOptions) {
+  options.event.preventDefault()
+
+  if (!(options.event.target instanceof HTMLElement)) return
+  if (!options.event.target.classList.contains("react-flow__pane")) return
+
   const position = options.instance.screenToFlowPosition({
     x: options.event.clientX,
     y: options.event.clientY,

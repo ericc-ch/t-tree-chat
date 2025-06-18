@@ -68,6 +68,7 @@ export const GOOGLE_MODEL_CAPABILITIES = new Map<
       systemPrompt: true,
       temperature: true,
       thinkingMode: true,
+      attachments: true,
     },
   ],
   [

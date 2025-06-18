@@ -1,6 +1,14 @@
 import type { ComponentProps, ComponentType } from "react"
 
-import { Slider, Space, Stack, Switch, Text, Textarea } from "@mantine/core"
+import {
+  Slider,
+  Space,
+  Stack,
+  Switch,
+  Text,
+  Textarea,
+  type SliderProps,
+} from "@mantine/core"
 import invariant from "tiny-invariant"
 
 import type {
@@ -34,30 +42,34 @@ const SystemPrompt = ({ defaultValue }: FieldProps<string>) => (
   />
 )
 
-const Temperature = ({ defaultValue }: FieldProps<number>) => (
-  <>
-    <Stack gap={0}>
-      <Text size="sm">Temperature</Text>
-      <Slider
-        // React flow utility classes
-        // https://reactflow.dev/api-reference/react-flow#nodragclassname
-        className="nodrag"
-        color="blue"
-        defaultValue={defaultValue}
-        marks={[
-          { value: 0.25, label: "0.25" },
-          { value: 0.5, label: "0.5" },
-          { value: 0.75, label: "0.75" },
-        ]}
-        max={1}
-        min={0}
-        name={GENERATION_CONFIG_KEY.TEMPERATURE}
-        step={0.05}
-      />
-    </Stack>
-    <Space h="sm" />
-  </>
-)
+const Temperature = ({ defaultValue }: FieldProps<number>) => {
+  const marks: SliderProps["marks"] = [
+    { value: 0.25, label: "0.25" },
+    { value: 0.5, label: "0.5" },
+    { value: 0.75, label: "0.75" },
+  ]
+
+  return (
+    <>
+      <Stack gap={0}>
+        <Text size="sm">Temperature</Text>
+        <Slider
+          // React flow utility classes
+          // https://reactflow.dev/api-reference/react-flow#nodragclassname
+          className="nodrag"
+          color="blue"
+          defaultValue={defaultValue}
+          marks={marks}
+          max={1}
+          min={0}
+          name={GENERATION_CONFIG_KEY.TEMPERATURE}
+          step={0.05}
+        />
+      </Stack>
+      <Space h="sm" />
+    </>
+  )
+}
 
 const ThinkingMode = ({ defaultValue }: FieldProps<boolean>) => (
   <Switch

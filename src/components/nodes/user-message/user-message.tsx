@@ -11,7 +11,7 @@ import {
   Textarea,
   ThemeIcon,
 } from "@mantine/core"
-import { Dropzone } from "@mantine/dropzone"
+import { Dropzone, MIME_TYPES } from "@mantine/dropzone"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import {
@@ -28,7 +28,11 @@ import invariant from "tiny-invariant"
 import { GENERATION_CONFIG_KEY } from "~/src/lib/constants"
 import { getConfig } from "~/src/lib/generation"
 import { buildMessages } from "~/src/lib/utils"
-import { ALL_MODEL_OPTIONS_MAPPER, ALL_MODELS } from "~/src/providers/all"
+import {
+  ALL_MODEL_CAPABILITIES,
+  ALL_MODEL_OPTIONS_MAPPER,
+  ALL_MODELS,
+} from "~/src/providers/all"
 import { useFlowStore, type UserMessageNode } from "~/src/stores/flow"
 
 import { AdvancedConfigForm } from "./advanced-config"
@@ -125,11 +129,11 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
             break
           }
           case "reasoning": {
-            // console.log(part.textDelta)
+            console.log(part.textDelta)
             break
           }
           default: {
-            // console.log(part)
+            console.log(part)
             break
           }
         }
@@ -157,6 +161,12 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
     }
   }
 
+  const capabilities = ALL_MODEL_CAPABILITIES.get(props.data.config.model)
+  invariant(
+    capabilities,
+    `Model capabilities not found for model ${props.data.config.model}`,
+  )
+
   return (
     <>
       {isChildNode && (
@@ -180,7 +190,7 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
         onSubmit={onSubmit}
       >
         <Stack gap="sm">
-          <Badge color="yellow">User</Badge>
+          <Badge color="blue">User</Badge>
 
           <Divider />
 
@@ -195,7 +205,11 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
               placeholder="Type your prompt here..."
             />
 
-            <Dropzone p="xs" onDrop={console.log}>
+            <Dropzone
+              accept={[MIME_TYPES.pdf, MIME_TYPES.jpeg, MIME_TYPES.png]}
+              p="xs"
+              onDrop={console.log}
+            >
               <Group gap="xs" justify="center">
                 <ThemeIcon c="dimmed" variant="transparent">
                   <Icon icon="mingcute:attachment-fill" />
@@ -245,14 +259,6 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
                 }}
               >
                 <Icon icon="mingcute:delete-fill" />
-              </ActionIcon>
-
-              <ActionIcon
-                aria-label="Duplicate node"
-                title="Duplicate node"
-                variant="outline"
-              >
-                <Icon icon="mingcute:git-branch-fill" />
               </ActionIcon>
 
               <ActionIcon

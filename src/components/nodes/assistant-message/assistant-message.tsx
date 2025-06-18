@@ -38,8 +38,8 @@ export function AssistantMessageNode(props: NodeProps<AssistantMessageNode>) {
       >
         <Stack gap="sm">
           <Group gap="xs">
-            <Badge color="blue">Assistant</Badge>
-            <Badge color="blue">{props.data.config.model}</Badge>
+            <Badge color="teal">Assistant</Badge>
+            <Badge color="teal">{props.data.config.model}</Badge>
           </Group>
 
           <Divider />

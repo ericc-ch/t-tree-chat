@@ -8,6 +8,7 @@ export const GENERATION_CONFIG_KEY = {
   SYSTEM_PROMPT: "systemPrompt",
   TEMPERATURE: "temperature",
   THINKING_MODE: "thinkingMode",
+  ATTACHMENTS: "attachments",
 } satisfies Record<string, keyof GenerationConfig | "message">
 
 export const NODE_ORIGIN: [number, number] = [0.5, 0]
