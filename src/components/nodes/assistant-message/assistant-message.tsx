@@ -48,6 +48,17 @@ export function AssistantMessageNode(props: NodeProps<AssistantMessageNode>) {
           <Group gap="xs">
             <Badge color="teal">Assistant</Badge>
             <Badge color="teal">{props.data.config.model}</Badge>
+
+            <ActionIcon
+              aria-label="Delete node"
+              color="red"
+              ml="auto"
+              title="Delete node"
+              variant="outline"
+              onClick={onDelete}
+            >
+              <Icon icon="mingcute:close-fill" />
+            </ActionIcon>
           </Group>
 
           <Divider />
@@ -59,17 +70,6 @@ export function AssistantMessageNode(props: NodeProps<AssistantMessageNode>) {
           <Divider />
 
           <Group gap="xs" justify="end">
-            <ActionIcon
-              aria-label="Delete node"
-              color="red"
-              mr="auto"
-              title="Delete node"
-              variant="outline"
-              onClick={onDelete}
-            >
-              <Icon icon="mingcute:delete-fill" />
-            </ActionIcon>
-
             <CopyButton message={props.data.message} />
             <ReplyButton nodeId={props.id} />
           </Group>

@@ -66,7 +66,8 @@ export function Form(props: NodeProps<UserMessageNode>) {
     const attachmentsString = formData.get(
       GENERATION_CONFIG_KEY.ATTACHMENTS,
     ) as string
-    const attachments = JSON.parse(attachmentsString) as Array<Attachment>
+    const attachments =
+      (JSON.parse(attachmentsString) as Array<Attachment> | null) ?? []
 
     const config = getConfig(formData)
 
@@ -196,7 +197,22 @@ export function Form(props: NodeProps<UserMessageNode>) {
       onSubmit={onSubmit}
     >
       <Stack gap="sm">
-        <Badge color="blue">User</Badge>
+        <Group gap="xs">
+          <Badge color="blue">User</Badge>
+
+          <ActionIcon
+            aria-label="Delete node"
+            color="red"
+            ml="auto"
+            title="Delete node"
+            variant="outline"
+            onClick={() => {
+              deleteNode(props.id)
+            }}
+          >
+            <Icon icon="mingcute:close-fill" />
+          </ActionIcon>
+        </Group>
 
         <Divider />
 
@@ -251,20 +267,7 @@ export function Form(props: NodeProps<UserMessageNode>) {
         <Divider />
 
         <Stack gap={0}>
-          <Group gap="xs">
-            <ActionIcon
-              aria-label="Delete node"
-              color="red"
-              mr="auto"
-              title="Delete node"
-              variant="outline"
-              onClick={() => {
-                deleteNode(props.id)
-              }}
-            >
-              <Icon icon="mingcute:delete-fill" />
-            </ActionIcon>
-
+          <Group gap="xs" justify="end">
             <ActionIcon
               aria-label="More options"
               title="More options"

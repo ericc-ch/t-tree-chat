@@ -166,7 +166,7 @@ export function Attachments(props: AttachmentsProps) {
               )
             }}
           >
-            <Icon icon="mingcute:close-fill" />
+            <Icon icon="mingcute:delete-2-line" />
           </ActionIcon>
         </Group>
       ))}
