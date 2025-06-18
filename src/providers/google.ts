@@ -19,9 +19,9 @@ const getGoogleProvider = () => {
   })
 }
 
-type GetGoogleModelParams = Parameters<GoogleGenerativeAIProvider>
-type GoogleModelID = GetGoogleModelParams[0] | "gemini-2.5-flash-preview-05-20"
-type GoogleModelSettings = GetGoogleModelParams[1]
+type GoogleProviderParams = Parameters<GoogleGenerativeAIProvider>
+type GoogleModelID = GoogleProviderParams[0] | "gemini-2.5-flash-preview-05-20"
+type GoogleModelSettings = GoogleProviderParams[1]
 
 export const getGoogleModel = (
   model: GoogleModelID,

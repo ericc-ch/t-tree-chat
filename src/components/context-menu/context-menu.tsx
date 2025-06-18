@@ -1,5 +1,6 @@
 import type { ReactFlowInstance } from "@xyflow/react"
 import type React from "react"
+import type { MouseEvent } from "react"
 
 import { Icon } from "@iconify/react"
 import { Menu } from "@mantine/core"
@@ -54,7 +55,7 @@ export function ContextMenu() {
 }
 
 interface menuClickListenerOptions {
-  event: React.MouseEvent
+  event: MouseEvent<HTMLDivElement>
   instance: ReactFlowInstance
 }
 

@@ -7,8 +7,11 @@ import {
   Paper,
   Select,
   Stack,
+  Text,
   Textarea,
+  ThemeIcon,
 } from "@mantine/core"
+import { Dropzone } from "@mantine/dropzone"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import {
@@ -170,6 +173,17 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
               name={GENERATION_CONFIG_KEY.MESSAGE}
               placeholder="Type your prompt here..."
             />
+
+            <Dropzone p="xs" onDrop={console.log}>
+              <Group gap="xs" justify="center">
+                <ThemeIcon c="dimmed" variant="transparent">
+                  <Icon icon="mingcute:attachment-fill" />
+                </ThemeIcon>
+                <Text c="dimmed" size="sm">
+                  Upload attachments
+                </Text>
+              </Group>
+            </Dropzone>
 
             <div className={classes.bottomContainer}>
               <Select

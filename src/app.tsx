@@ -1,3 +1,5 @@
+import type { MouseEvent } from "react"
+
 import { MantineProvider } from "@mantine/core"
 import { Notifications } from "@mantine/notifications"
 import { QueryClientProvider } from "@tanstack/react-query"
@@ -21,19 +23,17 @@ import { AssistantMessageNode } from "./components/nodes/assistant-message/assis
 import { UserMessageNode } from "./components/nodes/user-message/user-message"
 import { TopLeftPanel } from "./components/panels/top-left"
 import { NODE_ORIGIN } from "./lib/constants"
+import { queryClient } from "./lib/query"
 
 // Mantine
 import "@mantine/core/styles.layer.css"
 import "@mantine/notifications/styles.layer.css"
-// import "@mantine/code-highlight/styles.layer.css"
+import "@mantine/dropzone/styles.layer.css"
 // React Flow
 import "@xyflow/react/dist/style.css"
-// Highlight.js
-// import "highlight.js/styles/github.css"
 
 // Custom
 import "./styles/global.css"
-import { queryClient } from "./lib/query"
 import { useFlowStore, type FlowNode } from "./stores/flow"
 
 const nodeTypes = {
@@ -50,6 +50,11 @@ function Main() {
 
   const onNodesChange = useFlowStore((state) => state.onNodesChange)
 
+  const onContextMenu = (event: MouseEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    menuClickListener({ event, instance })
+  }
+
   return (
     <main>
       <div className={classes.flowContainer}>
@@ -62,10 +67,7 @@ function Main() {
           panOnDrag={false}
           panOnScroll={true}
           selectionMode={SelectionMode.Partial}
-          onContextMenu={(event) => {
-            event.preventDefault()
-            menuClickListener({ event, instance })
-          }}
+          onContextMenu={onContextMenu}
           onNodesChange={onNodesChange}
         >
           <Background gap={32} variant={BackgroundVariant.Cross} />
