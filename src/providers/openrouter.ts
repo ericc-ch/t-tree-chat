@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import {
   createOpenRouter,
   type OpenRouterProvider,
@@ -86,6 +87,10 @@ export const OPENROUTER_MODELS: Array<{
   {
     value: "mistralai/mistral-nemo:free",
     label: "Mistral Nemo (free)",
+  },
+  {
+    value: "mistralai/devstral-small:free",
+    label: "Devstral Small (free)",
   },
 ]
 
@@ -192,6 +197,15 @@ export const OPENROUTER_MODEL_CAPABILITIES = new Map<
   // Mistral
   [
     "mistralai/mistral-nemo:free",
+    {
+      systemPrompt: true,
+      temperature: true,
+      thinkingMode: false,
+      attachments: false,
+    },
+  ],
+  [
+    "mistralai/devstral-small:free",
     {
       systemPrompt: true,
       temperature: true,
@@ -317,6 +331,16 @@ export const OPENROUTER_MODEL_OPTIONS_MAPPER: Map<
     (config) => {
       return {
         model: getOpenRouterModel("mistralai/mistral-nemo:free"),
+        system: config.systemPrompt,
+        temperature: config.temperature,
+      }
+    },
+  ],
+  [
+    "mistralai/devstral-small:free",
+    (config) => {
+      return {
+        model: getOpenRouterModel("mistralai/devstral-small:free"),
         system: config.systemPrompt,
         temperature: config.temperature,
       }

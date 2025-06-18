@@ -85,6 +85,15 @@ export const GOOGLE_MODEL_CAPABILITIES = new Map<
     },
   ],
   [
+    "gemini-2.5-flash-lite-preview-06-17",
+    {
+      systemPrompt: true,
+      temperature: true,
+      thinkingMode: true,
+      attachments: { image: true, pdf: true },
+    },
+  ],
+  [
     "gemini-2.0-flash",
     {
       systemPrompt: true,
@@ -132,6 +141,27 @@ export const GOOGLE_MODEL_OPTIONS_MAPPER: Map<GoogleModelID, OptionsMapper> =
       (config) => {
         return {
           model: getGoogleModel("gemini-2.5-flash"),
+          system: config.systemPrompt,
+          temperature: config.temperature,
+          providerOptions: {
+            google: {
+              thinkingConfig: {
+                // TODO: Implement thinking budget
+                // 0 disables thinking mode btw
+                // https://ai-sdk.dev/providers/ai-sdk-providers/google-generative-ai#language-models
+                includeThoughts: config.thinkingMode,
+                thinkingBudget: config.thinkingMode ? null : 0,
+              },
+            } satisfies GoogleGenerativeAIProviderOptions,
+          },
+        }
+      },
+    ],
+    [
+      "gemini-2.5-flash-lite-preview-06-17",
+      (config) => {
+        return {
+          model: getGoogleModel("gemini-2.5-flash-lite-preview-06-17"),
           system: config.systemPrompt,
           temperature: config.temperature,
           providerOptions: {
