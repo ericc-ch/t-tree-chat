@@ -230,6 +230,12 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
               minRows={4}
               name={GENERATION_CONFIG_KEY.MESSAGE}
               placeholder="Type your prompt here..."
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault()
+                  event.currentTarget.form?.requestSubmit()
+                }
+              }}
             />
 
             {Boolean(capabilities.attachments) && (
