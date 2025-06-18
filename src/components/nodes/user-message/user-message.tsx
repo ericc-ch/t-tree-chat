@@ -24,13 +24,17 @@ import invariant from "tiny-invariant"
 
 import { GENERATION_CONFIG_KEY } from "~/src/lib/constants"
 import { getConfig, type AttachmentsCapabilities } from "~/src/lib/generation"
-import { buildMessages } from "~/src/lib/utils"
+import { buildMessages, buildUserMessage } from "~/src/lib/utils"
 import {
   ALL_MODEL_CAPABILITIES,
   ALL_MODEL_OPTIONS_MAPPER,
   ALL_MODELS,
 } from "~/src/providers/all"
-import { useFlowStore, type UserMessageNode } from "~/src/stores/flow"
+import {
+  useFlowStore,
+  type Attachment,
+  type UserMessageNode,
+} from "~/src/stores/flow"
 
 import { AdvancedConfigForm } from "./advanced-config"
 import { Attachments } from "./attachments"
@@ -58,10 +62,20 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
+    const capabilities = ALL_MODEL_CAPABILITIES.get(selectedModel)
+    invariant(
+      capabilities,
+      `Model capabilities not found for model ${selectedModel}`,
+    )
+
     const formData = new FormData(event.currentTarget)
 
-    const message = formData.get(GENERATION_CONFIG_KEY.MESSAGE) as string
     const model = formData.get(GENERATION_CONFIG_KEY.MODEL) as string
+    const message = formData.get(GENERATION_CONFIG_KEY.MESSAGE) as string
+    const attachmentsString = formData.get(
+      GENERATION_CONFIG_KEY.ATTACHMENTS,
+    ) as string
+    const attachments = JSON.parse(attachmentsString) as Array<Attachment>
 
     const config = getConfig(formData)
 
@@ -70,6 +84,7 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
       updater: (data) => ({
         ...data,
         message,
+        attachments,
         config: {
           model,
           ...config,
@@ -89,13 +104,27 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
     if (props.data.parentId) {
       // If it has a parent, we build the chat history first
       const ancestors = getAncestors(props.data.parentId)
-      messages = buildMessages(ancestors)
+      messages = buildMessages(ancestors, {
+        withAttachments: Boolean(capabilities.attachments),
+      })
     }
 
-    messages.push({
-      role: "user",
-      content: message,
-    })
+    messages.push(
+      buildUserMessage(
+        {
+          type: "userMessage",
+          data: {
+            ...props.data,
+            message,
+            attachments,
+            config: { model, ...config },
+          },
+        },
+        {
+          withAttachments: Boolean(capabilities.attachments),
+        },
+      ),
+    )
 
     const mapper = ALL_MODEL_OPTIONS_MAPPER.get(model)
     invariant(mapper, `No options parser found for model ${model}`)
@@ -159,10 +188,10 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
     }
   }
 
-  const capabilities = ALL_MODEL_CAPABILITIES.get(props.data.config.model)
+  const capabilities = ALL_MODEL_CAPABILITIES.get(selectedModel)
   invariant(
     capabilities,
-    `Model capabilities not found for model ${props.data.config.model}`,
+    `Model capabilities not found for model ${selectedModel}`,
   )
 
   return (

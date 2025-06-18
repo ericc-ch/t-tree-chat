@@ -106,6 +106,13 @@ export function Attachments(props: AttachmentsProps) {
     }
   }
 
+  const inputValue = JSON.stringify(
+    files.map((file) => ({
+      ...file,
+      file: undefined,
+    })),
+  )
+
   return (
     <Stack gap="4">
       <Dropzone accept={accept} mb="4" p="xs" onDrop={onDrop}>
@@ -122,6 +129,9 @@ export function Attachments(props: AttachmentsProps) {
       {files.map((file) => (
         <Group
           key={file.name}
+          component={file.url ? "a" : "div"}
+          // @ts-expect-error if url exists, it should be an anchor, if it's not, `href` gonna be undefined anyway
+          href={file.url}
           style={{
             borderColor: "var(--mantine-color-gray-4)",
             borderStyle: "solid",
@@ -129,6 +139,7 @@ export function Attachments(props: AttachmentsProps) {
             borderRadius: "var(--mantine-radius-default)",
             padding: "var(--mantine-spacing-xs)",
           }}
+          target="_blank"
         >
           <ThemeIcon variant="light">
             {file.uploaded ?
@@ -146,7 +157,9 @@ export function Attachments(props: AttachmentsProps) {
             ml="auto"
             title="Delete node"
             variant="outline"
-            onClick={() => {
+            onClick={(event) => {
+              event.stopPropagation()
+
               setFiles((oldFiles) =>
                 // eslint-disable-next-line max-nested-callbacks
                 oldFiles.filter((oldFile) => oldFile.name !== file.name),
@@ -158,7 +171,11 @@ export function Attachments(props: AttachmentsProps) {
         </Group>
       ))}
 
-      <input name={GENERATION_CONFIG_KEY.ATTACHMENTS} type="hidden" />
+      <input
+        name={GENERATION_CONFIG_KEY.ATTACHMENTS}
+        type="hidden"
+        value={inputValue}
+      />
     </Stack>
   )
 }

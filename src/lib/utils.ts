@@ -1,14 +1,59 @@
-import type { CoreMessage } from "ai"
+import type { CoreMessage, CoreUserMessage } from "ai"
 
 import type { FlowNode } from "../stores/flow"
 
+export const buildUserMessage = (
+  node: Pick<FlowNode, "type" | "data">,
+  { withAttachments = true }: { withAttachments: boolean },
+): CoreUserMessage => {
+  const content: CoreUserMessage["content"] = []
+  content.push({
+    type: "text",
+    text: node.data.message,
+  })
+
+  if (!withAttachments) return { role: "user", content }
+
+  for (const attachment of node.data.attachments) {
+    if (attachment.type === "image") {
+      content.push({
+        type: "image",
+        image: attachment.url,
+      })
+      continue
+    }
+
+    content.push({
+      type: "file",
+      mimeType: "application/pdf",
+      filename: attachment.name,
+      data: attachment.url,
+    })
+  }
+
+  return {
+    role: "user",
+    content,
+  }
+}
+
 export const buildMessages = (
   nodes: Array<Pick<FlowNode, "type" | "data">>,
+  { withAttachments = true }: { withAttachments: boolean },
 ): Array<CoreMessage> =>
   nodes.map((node) => {
+    if (node.type === "userMessage") {
+      return buildUserMessage(node, { withAttachments })
+    }
+
     return {
-      role: node.type === "userMessage" ? "user" : "assistant",
-      content: node.data.message,
+      role: "assistant",
+      content: [
+        {
+          type: "text",
+          text: node.data.message,
+        },
+      ],
     }
   })
 
