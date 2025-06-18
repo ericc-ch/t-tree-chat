@@ -36,26 +36,39 @@ export const OPENROUTER_MODELS: Array<{
   value: OpenRouterModelID
   label: string
 }> = [
+  // Qwen
   {
     value: "qwen/qwq-32b:free",
     label: "Qwen QwQ 32B (free)",
-  },
-  {
-    value: "qwen/qwen2.5-vl-32b-instruct:free",
-    label: "Qwen 2.5 VL 32B (free)",
   },
   {
     value: "qwen/qwen-2.5-coder-32b-instruct:free",
     label: "Qwen 2.5 Coder 32B (free)",
   },
   {
+    value: "qwen/qwen2.5-vl-32b-instruct:free",
+    label: "Qwen 2.5 VL 32B (free)",
+  },
+
+  // DeepSeek
+  {
+    value: "deepseek/deepseek-r1-0528:free",
+    label: "DeepSeek R1 0528 (free)",
+  },
+  {
     value: "deepseek/deepseek-r1:free",
     label: "DeepSeek R1 (free)",
   },
   {
-    value: "deepseek/deepseek-r1-0528-qwen3-8b:free",
-    label: "DeepSeek R1 0528 Qwen3 8B (free)",
+    value: "deepseek/deepseek-chat-v3-0324:free",
+    label: "DeepSeek V3 0324 (free)",
   },
+  {
+    value: "deepseek/deepseek-chat:free",
+    label: "DeepSeek V3 (free)",
+  },
+
+  // Llama
   {
     value: "meta-llama/llama-4-scout:free",
     label: "Llama 4 Scout (free)",
@@ -66,6 +79,7 @@ export const OPENROUTER_MODEL_CAPABILITIES = new Map<
   OpenRouterModelID,
   ModelCapabilities
 >([
+  // Qwen
   [
     "qwen/qwq-32b:free",
     {
@@ -86,6 +100,17 @@ export const OPENROUTER_MODEL_CAPABILITIES = new Map<
   ],
   [
     "qwen/qwen-2.5-coder-32b-instruct:free",
+    {
+      systemPrompt: true,
+      temperature: true,
+      thinkingMode: false,
+      attachments: false,
+    },
+  ],
+
+  // DeepSeek
+  [
+    "deepseek/deepseek-r1-0528:free",
     {
       systemPrompt: true,
       temperature: true,
@@ -103,7 +128,7 @@ export const OPENROUTER_MODEL_CAPABILITIES = new Map<
     },
   ],
   [
-    "deepseek/deepseek-r1-0528-qwen3-8b:free",
+    "deepseek/deepseek-chat-v3-0324:free",
     {
       systemPrompt: true,
       temperature: true,
@@ -111,6 +136,17 @@ export const OPENROUTER_MODEL_CAPABILITIES = new Map<
       attachments: false,
     },
   ],
+  [
+    "deepseek/deepseek-chat:free",
+    {
+      systemPrompt: true,
+      temperature: true,
+      thinkingMode: false,
+      attachments: false,
+    },
+  ],
+
+  // Llama
   [
     "meta-llama/llama-4-scout:free",
     {
@@ -126,6 +162,7 @@ export const OPENROUTER_MODEL_OPTIONS_MAPPER: Map<
   OpenRouterModelID,
   OptionsMapper
 > = new Map([
+  // Qwen
   [
     "qwen/qwq-32b:free",
     (config) => {
@@ -140,7 +177,7 @@ export const OPENROUTER_MODEL_OPTIONS_MAPPER: Map<
     "qwen/qwen-2.5-coder-32b-instruct:free",
     (config) => {
       return {
-        model: getOpenRouterModel("qwen/qwq-32b:free"),
+        model: getOpenRouterModel("qwen/qwen-2.5-coder-32b-instruct:free"),
         system: config.systemPrompt,
         temperature: config.temperature,
       }
@@ -151,6 +188,18 @@ export const OPENROUTER_MODEL_OPTIONS_MAPPER: Map<
     (config) => {
       return {
         model: getOpenRouterModel("qwen/qwen2.5-vl-32b-instruct:free"),
+        system: config.systemPrompt,
+        temperature: config.temperature,
+      }
+    },
+  ],
+
+  // DeepSeek
+  [
+    "deepseek/deepseek-r1-0528:free",
+    (config) => {
+      return {
+        model: getOpenRouterModel("deepseek/deepseek-r1-0528:free"),
         system: config.systemPrompt,
         temperature: config.temperature,
       }
@@ -167,15 +216,27 @@ export const OPENROUTER_MODEL_OPTIONS_MAPPER: Map<
     },
   ],
   [
-    "deepseek/deepseek-r1-0528-qwen3-8b:free",
+    "deepseek/deepseek-chat-v3-0324:free",
     (config) => {
       return {
-        model: getOpenRouterModel("deepseek/deepseek-r1-0528-qwen3-8b:free"),
+        model: getOpenRouterModel("deepseek/deepseek-chat-v3-0324:free"),
         system: config.systemPrompt,
         temperature: config.temperature,
       }
     },
   ],
+  [
+    "deepseek/deepseek-chat:free",
+    (config) => {
+      return {
+        model: getOpenRouterModel("deepseek/deepseek-chat:free"),
+        system: config.systemPrompt,
+        temperature: config.temperature,
+      }
+    },
+  ],
+
+  // Llama
   [
     "meta-llama/llama-4-scout:free",
     (config) => {
