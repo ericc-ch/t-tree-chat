@@ -35,6 +35,7 @@ import "@xyflow/react/dist/style.css"
 // Custom
 import "./styles/global.css"
 import { useFlowStore, type FlowNode } from "./stores/flow"
+import { useUIStore } from "./stores/ui"
 
 const nodeTypes = {
   userMessage: UserMessageNode,
@@ -49,6 +50,8 @@ function Main() {
   const edges = useFlowStore((state) => state.edges)
 
   const onNodesChange = useFlowStore((state) => state.onNodesChange)
+
+  const closeContextMenu = useUIStore((state) => state.closeContextMenu)
 
   const onContextMenu = (event: MouseEvent<HTMLDivElement>) => {
     menuClickListener({ event, instance })
@@ -67,6 +70,7 @@ function Main() {
           selectionMode={SelectionMode.Partial}
           onContextMenu={onContextMenu}
           onNodesChange={onNodesChange}
+          onPaneClick={closeContextMenu}
         >
           <Background gap={32} variant={BackgroundVariant.Cross} />
           <Controls />
