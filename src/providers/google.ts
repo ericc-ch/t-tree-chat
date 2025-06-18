@@ -68,7 +68,7 @@ export const GOOGLE_MODEL_CAPABILITIES = new Map<
       systemPrompt: true,
       temperature: true,
       thinkingMode: true,
-      attachments: true,
+      attachments: { image: true, pdf: true },
     },
   ],
   [
@@ -77,6 +77,7 @@ export const GOOGLE_MODEL_CAPABILITIES = new Map<
       systemPrompt: true,
       temperature: true,
       thinkingMode: false,
+      attachments: { image: true, pdf: true },
     },
   ],
   [
@@ -85,6 +86,7 @@ export const GOOGLE_MODEL_CAPABILITIES = new Map<
       systemPrompt: true,
       temperature: true,
       thinkingMode: false,
+      attachments: { image: true, pdf: true },
     },
   ],
 ])

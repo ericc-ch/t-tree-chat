@@ -16,10 +16,17 @@ import {
   type GenerationConfig,
 } from "../lib/generation"
 
+export interface Attachment {
+  type: "image" | "pdf"
+  name: string
+  url: string
+}
+
 interface MessageNodeData extends Record<string, unknown> {
   config: GenerationConfig
 
   message: string
+  attachments: Array<Attachment>
   parentId?: string
   childrenIds: Array<string>
 }
@@ -83,6 +90,7 @@ export const useFlowStore = create<FlowState>((set, get) => ({
       position,
       data: {
         message: "",
+        attachments: [],
         parentId: undefined,
         childrenIds: [],
         config: structuredClone(DEFAULT_GENERATION_CONFIG),
@@ -134,6 +142,7 @@ export const useFlowStore = create<FlowState>((set, get) => ({
       },
       data: {
         message: "",
+        attachments: [],
         parentId,
         childrenIds: [],
         config: structuredClone(parentNode.data.config),

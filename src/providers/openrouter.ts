@@ -56,6 +56,7 @@ export const OPENROUTER_MODEL_CAPABILITIES = new Map<
       systemPrompt: true,
       temperature: true,
       thinkingMode: false,
+      attachments: false,
     },
   ],
   [
@@ -64,6 +65,7 @@ export const OPENROUTER_MODEL_CAPABILITIES = new Map<
       systemPrompt: true,
       temperature: true,
       thinkingMode: false,
+      attachments: { image: true, pdf: false },
     },
   ],
 ])

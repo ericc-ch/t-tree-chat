@@ -1,5 +1,13 @@
 import { Icon } from "@iconify/react"
-import { ActionIcon, Badge, Divider, Group, Paper, Stack } from "@mantine/core"
+import {
+  ActionIcon,
+  Badge,
+  Box,
+  Divider,
+  Group,
+  Paper,
+  Stack,
+} from "@mantine/core"
 import { Handle, Position, type NodeProps } from "@xyflow/react"
 
 import { useFlowStore, type AssistantMessageNode } from "~/src/stores/flow"
@@ -44,7 +52,9 @@ export function AssistantMessageNode(props: NodeProps<AssistantMessageNode>) {
 
           <Divider />
 
-          <MarkdownRenderer markdown={props.data.message} />
+          <Box my="sm">
+            <MarkdownRenderer markdown={props.data.message} />
+          </Box>
 
           <Divider />
 

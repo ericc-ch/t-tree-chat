@@ -11,7 +11,15 @@ export interface GenerationConfig extends AdvancedConfig {
   model: string
 }
 
-export type ModelCapabilities = Record<keyof AdvancedConfig, boolean>
+export interface AttachmentsCapabilities {
+  image: boolean
+  pdf: boolean
+}
+
+export interface ModelCapabilities
+  extends Record<keyof AdvancedConfig, boolean> {
+  attachments: AttachmentsCapabilities | false
+}
 
 export const DEFAULT_GENERATION_CONFIG: GenerationConfig = {
   model: GOOGLE_MODELS[0].value,

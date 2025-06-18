@@ -35,7 +35,7 @@ export function ContextMenu() {
 
       <Menu.Dropdown>
         <Menu.Item
-          leftSection={<Icon fontSize={14} icon="mingcute:add-fill" />}
+          leftSection={<Icon fontSize="0.875em" icon="mingcute:add-fill" />}
           onClick={() => {
             const menuTarget = getMenuTarget()
             const position = menuTarget.dataset.position

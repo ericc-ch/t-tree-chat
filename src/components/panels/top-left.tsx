@@ -23,7 +23,7 @@ const SyncIndicator = () => {
   const isSyncing = useUIStore((state) => state.isSyncing)
 
   return isSyncing ?
-      <ThemeIcon>
+      <ThemeIcon variant="light">
         <Icon className="spin-cc" icon="uil:sync" />
       </ThemeIcon>
     : undefined

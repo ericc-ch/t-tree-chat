@@ -7,11 +7,8 @@ import {
   Paper,
   Select,
   Stack,
-  Text,
   Textarea,
-  ThemeIcon,
 } from "@mantine/core"
-import { Dropzone, MIME_TYPES } from "@mantine/dropzone"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import {
@@ -26,7 +23,7 @@ import { useState, type FormEvent } from "react"
 import invariant from "tiny-invariant"
 
 import { GENERATION_CONFIG_KEY } from "~/src/lib/constants"
-import { getConfig } from "~/src/lib/generation"
+import { getConfig, type AttachmentsCapabilities } from "~/src/lib/generation"
 import { buildMessages } from "~/src/lib/utils"
 import {
   ALL_MODEL_CAPABILITIES,
@@ -36,6 +33,7 @@ import {
 import { useFlowStore, type UserMessageNode } from "~/src/stores/flow"
 
 import { AdvancedConfigForm } from "./advanced-config"
+import { Attachments } from "./attachments"
 import classes from "./user-message.module.css"
 
 export function UserMessageNode(props: NodeProps<UserMessageNode>) {
@@ -194,7 +192,7 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
 
           <Divider />
 
-          <Stack gap="sm">
+          <Stack gap="lg">
             <Textarea
               autosize
               defaultValue={props.data.message}
@@ -205,20 +203,14 @@ export function UserMessageNode(props: NodeProps<UserMessageNode>) {
               placeholder="Type your prompt here..."
             />
 
-            <Dropzone
-              accept={[MIME_TYPES.pdf, MIME_TYPES.jpeg, MIME_TYPES.png]}
-              p="xs"
-              onDrop={console.log}
-            >
-              <Group gap="xs" justify="center">
-                <ThemeIcon c="dimmed" variant="transparent">
-                  <Icon icon="mingcute:attachment-fill" />
-                </ThemeIcon>
-                <Text c="dimmed" size="sm">
-                  Upload attachments
-                </Text>
-              </Group>
-            </Dropzone>
+            {Boolean(capabilities.attachments) && (
+              <Attachments
+                capabilities={
+                  capabilities.attachments as AttachmentsCapabilities
+                }
+                defaultValues={props.data.attachments}
+              />
+            )}
 
             <div className={classes.bottomContainer}>
               <Select

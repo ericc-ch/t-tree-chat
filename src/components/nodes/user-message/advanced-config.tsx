@@ -112,13 +112,18 @@ export const AdvancedConfigForm = (props: AdvancedConfigFormProps) => {
   return (
     <Stack display={props.opened ? "flex" : "none"} gap="sm" pt="md">
       {capabilityKeys.map((key: keyof ModelCapabilities) => {
-        const Field = advancedConfigMap.get(key)
+        const Field = advancedConfigMap.get(key as keyof AdvancedConfig)
         if (!Field) {
-          console.warn(`No setting field found for ${key}`)
+          console.warn(`No setting field found for "${key}"`)
           return undefined
         }
 
-        return <Field key={key} defaultValue={props.config[key]} />
+        return (
+          <Field
+            key={key}
+            defaultValue={props.config[key as keyof AdvancedConfig]}
+          />
+        )
       })}
     </Stack>
   )
